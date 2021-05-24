@@ -9,8 +9,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.pm.cameraui.R;
+import com.pm.cameraui.utils.TimeUtil;
 
 public class MyVidoeController extends RelativeLayout {
 
@@ -18,6 +20,7 @@ public class MyVidoeController extends RelativeLayout {
     Button btnStart,btnCameraSwitch,btnStop,btnContinue,btnPause,btnTakePic;
     LinearLayout llRecording;
     ImageView imgPreview;
+    TextView tvRedDot,tvTimer;
 
 
     public MyVidoeController(Context context) {
@@ -45,11 +48,14 @@ public class MyVidoeController extends RelativeLayout {
         btnCameraSwitch = findViewById(R.id.btnSwitchCamera);
         btnTakePic = findViewById(R.id.btnTakePic);
         imgPreview = findViewById(R.id.imgPreview);
-
+        tvRedDot = findViewById(R.id.tvRedDot);
+        tvTimer = findViewById(R.id.tvTimer);
+        tvRedDot.setVisibility(View.GONE);
         btnStart.setOnClickListener(view->{
             if(mCallback!=null){
                 if (mCallback != null) {
                     mCallback.recordStart();
+                    setRecordDotShow(true);
                 }
             }
         });
@@ -57,6 +63,7 @@ public class MyVidoeController extends RelativeLayout {
             if(mCallback!=null){
                 if (mCallback != null) {
                     mCallback.recordStop();
+                    setRecordDotShow(false);
                 }
             }
         });
@@ -68,11 +75,13 @@ public class MyVidoeController extends RelativeLayout {
         btnPause.setOnClickListener(view->{
             if(mCallback!=null){
                 mCallback.recordPause();
+                setRecordDotShow(false);
             }
         });
         btnContinue.setOnClickListener(view->{
             if(mCallback!=null){
                 mCallback.recordContinue();
+                setRecordDotShow(true);
             }
         });
         btnTakePic.setOnClickListener(view->{
@@ -105,5 +114,17 @@ public class MyVidoeController extends RelativeLayout {
     public void continueRecording(){
         btnPause.setVisibility(View.VISIBLE);
         btnContinue.setVisibility(View.GONE);
+    }
+
+    public void setRecordDotShow(boolean isShow){
+        if(tvRedDot!=null){
+            tvRedDot.setVisibility(isShow?View.VISIBLE:View.GONE);
+        }
+    }
+
+    public void refreshTimer(long time){
+        if(tvTimer!=null){
+            tvTimer.setText(TimeUtil.formatTime(time));
+        }
     }
 }

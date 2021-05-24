@@ -5,26 +5,22 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
-import android.media.ImageReader;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.VideoView;
 
-import com.pm.cameracore.CaptureDelegate;
 import com.pm.cameracore.DelegateCallback;
 import com.pm.cameracore.RecordDelegate;
 import com.pm.cameraui.utils.UploadUtil;
 import com.pm.cameraui.widget.AutoFitTextureView;
 import com.pm.cameraui.widget.CameraController;
-import com.pm.cameraui.widget.CaptureButton;
 import com.pm.cameraui.widget.MyVidoeController;
 import com.pm.cameraui.widget.VideoViewController;
 
@@ -35,8 +31,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
+import java.util.TimerTask;
 
-import VideoHandle.EpEditor;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -48,6 +44,10 @@ public class VideoFragment extends BaseCameraFragment implements DelegateCallbac
     private RecordDelegate mRecordDelegate;
     private MyVidoeController myVideoController;
     private boolean isLastVideoPath = false;
+
+    private long startTimer = System.currentTimeMillis();
+    private long endTimer = System.currentTimeMillis();
+    private long periodTime = 0;
 
     private List<String> recordFileList = new ArrayList<>();
 
@@ -86,7 +86,6 @@ public class VideoFragment extends BaseCameraFragment implements DelegateCallbac
 
         mRecordDelegate = new RecordDelegate(getActivity(), this);
 
-
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
         mController = view.findViewById(R.id.controller);
         mVideoViewController = view.findViewById(R.id.vv_controller);
@@ -106,7 +105,7 @@ public class VideoFragment extends BaseCameraFragment implements DelegateCallbac
 
             @Override
             public void recordStop() {
-                isLastVideoPath  = true;
+                isLastVideoPath = true;
                 //真正退出，不及时预览
                 stopRecording();
             }
@@ -125,7 +124,7 @@ public class VideoFragment extends BaseCameraFragment implements DelegateCallbac
             @Override
             public void onCancel() {
                 mVideoViewController.hide();
-                Log.d("RAMBO","onCancel");
+                Log.d("RAMBO", "onCancel");
             }
 
             @Override
@@ -142,7 +141,7 @@ public class VideoFragment extends BaseCameraFragment implements DelegateCallbac
 
             @Override
             public void onSwitchCamera() {
-                Log.d("RAMBO","onCustomRight");
+                Log.d("RAMBO", "onCustomRight");
                 switchCameraID();
             }
         });
@@ -199,7 +198,7 @@ public class VideoFragment extends BaseCameraFragment implements DelegateCallbac
     }
 
 
-    public void switchCameraID(){
+    public void switchCameraID() {
         mRecordDelegate.switchCameraID();
         mRecordDelegate.closeCamera();
         onPrepareCamera(mTextureView.getWidth(), mTextureView.getHeight());
@@ -219,28 +218,27 @@ public class VideoFragment extends BaseCameraFragment implements DelegateCallbac
     @Override
     public void onPause() {
         super.onPause();
-        mRecordDelegate.stopRecordingVideo(true);
-        closeCamera();
-        mRecordDelegate.stopBackgroundThread();
-        myVideoController.refreshUIRecord(false);
-//        mVideoViewController.hide();
+        myVideoController.setRecordDotShow(false);
+        if (mRecordDelegate.isRecording()) {
+            pauseRecording();
+        }
     }
 
-    public void startRecording(){
+    public void startRecording() {
         mRecordDelegate.startRecordingVideo();
         myVideoController.refreshUIRecord(true);
         mRecordDelegate.startBackgroundThread();
     }
 
-    public void stopRecording(){
-        if(mRecordDelegate.isRecording()){
+    public void stopRecording() {
+        if (mRecordDelegate.isRecording()) {
             mRecordDelegate.stopRecordingVideo(true);
             closeCamera();
             mRecordDelegate.stopBackgroundThread();
             mVideoViewController.hide();
             onPrepareCamera(mTextureView.getWidth(), mTextureView.getHeight());
-        }else{
-            if(isLastVideoPath){
+        } else {
+            if (isLastVideoPath) {
                 mergeSaveList();
             }
         }
@@ -248,7 +246,7 @@ public class VideoFragment extends BaseCameraFragment implements DelegateCallbac
         myVideoController.refreshUIRecord(false);
     }
 
-    public void pauseRecording(){
+    public void pauseRecording() {
         mRecordDelegate.stopRecordingVideo(true);
         closeCamera();
         myVideoController.refreshUIRecord(true);
@@ -258,7 +256,7 @@ public class VideoFragment extends BaseCameraFragment implements DelegateCallbac
         myVideoController.pauseRecording();
     }
 
-    public void continueRecording(){
+    public void continueRecording() {
         myVideoController.continueRecording();
         startRecording();
     }
@@ -279,7 +277,8 @@ public class VideoFragment extends BaseCameraFragment implements DelegateCallbac
     }
 
     @Override
-    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {}
+    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+    }
 
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
@@ -287,7 +286,8 @@ public class VideoFragment extends BaseCameraFragment implements DelegateCallbac
     }
 
     @Override
-    public void onSurfaceTextureUpdated(SurfaceTexture surface) {}
+    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+    }
 
     @Override
     public void onChangeViewSize(Size size) {
@@ -311,43 +311,43 @@ public class VideoFragment extends BaseCameraFragment implements DelegateCallbac
 
     @Override
     public void onCaptureResult(Bitmap bitmap) {
-        if(bitmap!=null){
-            Log.d("RAMBO","onCaptureResult: bitmap count = "+bitmap.getByteCount());
+        if (bitmap != null) {
+            Log.d("RAMBO", "onCaptureResult: bitmap count = " + bitmap.getByteCount());
         }
         myVideoController.setPreViewImage(bitmap);
     }
 
     @Override
     public void onRecordResult(Bitmap coverBitmap, String videoAbsolutePath) {
-        Log.d("RAMBO","Video 生成文件:"+videoAbsolutePath);
+        Log.d("RAMBO", "Video 生成文件:" + videoAbsolutePath);
 //        mVideoViewController.show(coverBitmap,videoAbsolutePath);
         addToSaveList(videoAbsolutePath);
-        if(isLastVideoPath){
+        if (isLastVideoPath) {
             mergeSaveList();
         }
     }
 
-    public void addToSaveList(String filePath){
-        if(!TextUtils.isEmpty(filePath)){
+    public void addToSaveList(String filePath) {
+        if (!TextUtils.isEmpty(filePath)) {
             recordFileList.add(filePath);
         }
     }
 
     //记录视频的列表
-    public void clearSaveList(){
-        if(recordFileList!=null){
+    public void clearSaveList() {
+        if (recordFileList != null) {
             recordFileList.clear();
         }
     }
 
     //合成列表的视频成为一个整视频
-    public void mergeSaveList(){
-        Log.d("RAMBO","视频任务拍摄结束：开始MergeSaveList");
+    public void mergeSaveList() {
+        Log.d("RAMBO", "视频任务拍摄结束：开始MergeSaveList");
         String mergeVideoPath = createVideoFilePath(getActivity());
         UploadUtil.mergeVideos(getActivity(), mergeVideoPath, recordFileList, new UploadUtil.OnMergeSuccessListener() {
             @Override
             public void onMergeSuccess(String outFile) {
-                Log.d("RAMBO","合成成功了文件："+outFile);
+                Log.d("RAMBO", "合成成功了文件：" + outFile);
                 clearSaveList();
             }
         });
@@ -358,5 +358,59 @@ public class VideoFragment extends BaseCameraFragment implements DelegateCallbac
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSSS", Locale.getDefault());
         String dateStr = dateFormat.format(new Date());
         return (dir == null ? "" : (dir.getAbsolutePath() + "/")) + dateStr + ".mp4";
+    }
+
+    Timer timer ;
+    TimerTask task = new TimerTask() {
+        @Override
+        public void run() {
+            try {
+                Message message = new Message();
+                message.what = 200;
+                handler.sendMessage(message);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    };
+
+
+    Handler handler = new Handler() {
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case 200:
+                    myVideoController.refreshTimer(System.currentTimeMillis() - startTimer);
+                    break;
+            }
+        }
+    };
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        timer = new Timer();
+        task = new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    Message message = new Message();
+                    message.what = 200;
+                    handler.sendMessage(message);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+       timer.schedule(task, 0, 1000);
+    }
+
+
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if(timer!=null){
+            timer.cancel();
+        }
     }
 }
