@@ -67,7 +67,12 @@ public class MyVidoeController extends RelativeLayout {
         });
         btnPause.setOnClickListener(view->{
             if(mCallback!=null){
-
+                mCallback.recordPause();
+            }
+        });
+        btnContinue.setOnClickListener(view->{
+            if(mCallback!=null){
+                mCallback.recordContinue();
             }
         });
         btnTakePic.setOnClickListener(view->{
@@ -90,5 +95,15 @@ public class MyVidoeController extends RelativeLayout {
 
     public void setPreViewImage(Bitmap bitmap){
         imgPreview.setBackground(new BitmapDrawable(bitmap));
+    }
+
+    public void pauseRecording(){
+        btnPause.setVisibility(View.GONE);
+        btnContinue.setVisibility(View.VISIBLE);
+    }
+
+    public void continueRecording(){
+        btnPause.setVisibility(View.VISIBLE);
+        btnContinue.setVisibility(View.GONE);
     }
 }

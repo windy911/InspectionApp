@@ -97,6 +97,16 @@ public class PictureFragment extends BaseCameraFragment implements DelegateCallb
             }
 
             @Override
+            public void recordPause() {
+
+            }
+
+            @Override
+            public void recordContinue() {
+
+            }
+
+            @Override
             public void onCancel() {
                 showResultImage(false, null);
             }

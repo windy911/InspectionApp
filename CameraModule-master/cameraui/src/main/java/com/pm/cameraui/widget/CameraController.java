@@ -371,6 +371,10 @@ public class CameraController extends FrameLayout {
 
         void recordStop();
 
+        void recordPause();
+
+        void recordContinue();
+
         void onCancel();
 
         void onConfirm();

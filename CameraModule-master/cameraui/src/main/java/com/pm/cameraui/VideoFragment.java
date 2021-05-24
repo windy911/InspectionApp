@@ -1,5 +1,6 @@
 package com.pm.cameraui;
 
+import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
@@ -7,6 +8,8 @@ import android.graphics.SurfaceTexture;
 import android.media.ImageReader;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.Size;
 import android.view.LayoutInflater;
@@ -18,12 +21,22 @@ import android.widget.VideoView;
 import com.pm.cameracore.CaptureDelegate;
 import com.pm.cameracore.DelegateCallback;
 import com.pm.cameracore.RecordDelegate;
+import com.pm.cameraui.utils.UploadUtil;
 import com.pm.cameraui.widget.AutoFitTextureView;
 import com.pm.cameraui.widget.CameraController;
 import com.pm.cameraui.widget.CaptureButton;
 import com.pm.cameraui.widget.MyVidoeController;
 import com.pm.cameraui.widget.VideoViewController;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Timer;
+
+import VideoHandle.EpEditor;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -34,6 +47,9 @@ public class VideoFragment extends BaseCameraFragment implements DelegateCallbac
     private CameraController mController;
     private RecordDelegate mRecordDelegate;
     private MyVidoeController myVideoController;
+    private boolean isLastVideoPath = false;
+
+    private List<String> recordFileList = new ArrayList<>();
 
     /**
      * Use this factory method to create a new instance of
@@ -83,16 +99,27 @@ public class VideoFragment extends BaseCameraFragment implements DelegateCallbac
 
             @Override
             public void recordStart() {
-                mRecordDelegate.startRecordingVideo();
-                myVideoController.refreshUIRecord(true);
+                isLastVideoPath = false;
+                clearSaveList();
+                startRecording();
             }
 
             @Override
             public void recordStop() {
+                isLastVideoPath  = true;
                 //真正退出，不及时预览
-                mRecordDelegate.stopRecordingVideo(true);
-                myVideoController.refreshUIRecord(false);
-                onPrepareCamera(mTextureView.getWidth(), mTextureView.getHeight());
+                stopRecording();
+            }
+
+            @Override
+            public void recordPause() {
+                //真正退出，不及时预览
+                pauseRecording();
+            }
+
+            @Override
+            public void recordContinue() {
+                continueRecording();
             }
 
             @Override
@@ -171,6 +198,7 @@ public class VideoFragment extends BaseCameraFragment implements DelegateCallbac
 //        });
     }
 
+
     public void switchCameraID(){
         mRecordDelegate.switchCameraID();
         mRecordDelegate.closeCamera();
@@ -194,7 +222,45 @@ public class VideoFragment extends BaseCameraFragment implements DelegateCallbac
         mRecordDelegate.stopRecordingVideo(true);
         closeCamera();
         mRecordDelegate.stopBackgroundThread();
+        myVideoController.refreshUIRecord(false);
+//        mVideoViewController.hide();
+    }
+
+    public void startRecording(){
+        mRecordDelegate.startRecordingVideo();
+        myVideoController.refreshUIRecord(true);
+        mRecordDelegate.startBackgroundThread();
+    }
+
+    public void stopRecording(){
+        if(mRecordDelegate.isRecording()){
+            mRecordDelegate.stopRecordingVideo(true);
+            closeCamera();
+            mRecordDelegate.stopBackgroundThread();
+            mVideoViewController.hide();
+            onPrepareCamera(mTextureView.getWidth(), mTextureView.getHeight());
+        }else{
+            if(isLastVideoPath){
+                mergeSaveList();
+            }
+        }
+        myVideoController.continueRecording();
+        myVideoController.refreshUIRecord(false);
+    }
+
+    public void pauseRecording(){
+        mRecordDelegate.stopRecordingVideo(true);
+        closeCamera();
+        myVideoController.refreshUIRecord(true);
+        mRecordDelegate.stopBackgroundThread();
         mVideoViewController.hide();
+        onPrepareCamera(mTextureView.getWidth(), mTextureView.getHeight());
+        myVideoController.pauseRecording();
+    }
+
+    public void continueRecording(){
+        myVideoController.continueRecording();
+        startRecording();
     }
 
     @Override
@@ -253,9 +319,44 @@ public class VideoFragment extends BaseCameraFragment implements DelegateCallbac
 
     @Override
     public void onRecordResult(Bitmap coverBitmap, String videoAbsolutePath) {
-        Log.d("RAMBO","VideoAbsolutePath:"+videoAbsolutePath);
+        Log.d("RAMBO","Video 生成文件:"+videoAbsolutePath);
 //        mVideoViewController.show(coverBitmap,videoAbsolutePath);
-
+        addToSaveList(videoAbsolutePath);
+        if(isLastVideoPath){
+            mergeSaveList();
+        }
     }
 
+    public void addToSaveList(String filePath){
+        if(!TextUtils.isEmpty(filePath)){
+            recordFileList.add(filePath);
+        }
+    }
+
+    //记录视频的列表
+    public void clearSaveList(){
+        if(recordFileList!=null){
+            recordFileList.clear();
+        }
+    }
+
+    //合成列表的视频成为一个整视频
+    public void mergeSaveList(){
+        Log.d("RAMBO","视频任务拍摄结束：开始MergeSaveList");
+        String mergeVideoPath = createVideoFilePath(getActivity());
+        UploadUtil.mergeVideos(getActivity(), mergeVideoPath, recordFileList, new UploadUtil.OnMergeSuccessListener() {
+            @Override
+            public void onMergeSuccess(String outFile) {
+                Log.d("RAMBO","合成成功了文件："+outFile);
+                clearSaveList();
+            }
+        });
+    }
+
+    private String createVideoFilePath(Context context) {
+        final File dir = context.getExternalFilesDir(Environment.DIRECTORY_MOVIES);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSSS", Locale.getDefault());
+        String dateStr = dateFormat.format(new Date());
+        return (dir == null ? "" : (dir.getAbsolutePath() + "/")) + dateStr + ".mp4";
+    }
 }

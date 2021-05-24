@@ -131,6 +131,10 @@ public class RecordDelegate implements CameraDelegate {
     private MediaRecorder mMediaRecorder;
     private boolean mIsRecordingVideo;
 
+    public boolean isRecording(){
+        return mIsRecordingVideo;
+    }
+
     public RecordDelegate(Context mContext, DelegateCallback mCallback) {
         this.mContext = mContext;
         this.mCallback = mCallback;
@@ -357,6 +361,7 @@ public class RecordDelegate implements CameraDelegate {
         if (null == mCameraDevice || null == mPreviewSize) {
             return;
         }
+
         closePreviewSession();
         setUpMediaRecorder();
 
@@ -401,7 +406,6 @@ public class RecordDelegate implements CameraDelegate {
             e.printStackTrace();
         }
     }
-
     /**
      * 停止录制
      *
@@ -412,23 +416,25 @@ public class RecordDelegate implements CameraDelegate {
             return;
         }
         mIsRecordingVideo = false;
-//        mButtonVideo.setText(R.string.record);
         mMediaRecorder.stop();
         mMediaRecorder.reset();
         mMediaRecorder.release();
         mMediaRecorder = null;
         mCallback.onRecordResult(null, mNextVideoAbsolutePath);
         Log.d(TAG, "Video saved: " + mNextVideoAbsolutePath);
-//        mNextVideoAbsolutePath = null;
         if (isQuit) {
             return;
         }
         createCameraPreviewSession(mCameraDevice);
     }
 
+    public void pauseRecordingVideo(){
+        stopRecordingVideo(true);
+    }
+
+
     private String createVideoFilePath(Context context) {
         final File dir = context.getExternalFilesDir(Environment.DIRECTORY_MOVIES);
-
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSSS", Locale.getDefault());
         String dateStr = dateFormat.format(new Date());
         return (dir == null ? "" : (dir.getAbsolutePath() + "/")) + dateStr + ".mp4";
@@ -445,17 +451,19 @@ public class RecordDelegate implements CameraDelegate {
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
 
+//        if (mNextVideoAbsolutePath == null || mNextVideoAbsolutePath.isEmpty()) {
+//        }
 
-        if (mNextVideoAbsolutePath == null || mNextVideoAbsolutePath.isEmpty()) {
-        }
         mNextVideoAbsolutePath = createVideoFilePath(mContext);
         mMediaRecorder.setOutputFile(mNextVideoAbsolutePath);
         mMediaRecorder.setVideoEncodingBitRate(10000000);
+
         //每秒30帧
         mMediaRecorder.setVideoFrameRate(15);
         mMediaRecorder.setVideoSize(mVideoSize.getWidth(), mVideoSize.getHeight());
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
         mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+
         int rotation = mWindowManager.getDefaultDisplay().getRotation();
         switch (mSensorOrientation) {
             case SENSOR_ORIENTATION_DEFAULT_DEGREES:
@@ -505,13 +513,15 @@ public class RecordDelegate implements CameraDelegate {
 
     @Override
     public void stopBackgroundThread() {
-        mBackgroundThread.quitSafely();
-        try {
-            mBackgroundThread.join();
-            mBackgroundThread = null;
-            mBackgroundHandler = null;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if(mBackgroundThread!=null){
+            mBackgroundThread.quitSafely();
+            try {
+                mBackgroundThread.join();
+                mBackgroundThread = null;
+                mBackgroundHandler = null;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -526,10 +536,7 @@ public class RecordDelegate implements CameraDelegate {
         } else if (mCameraId.equals("1")) {
             mCameraId = "0";
         }
-        Log.d("RAMBO","current mCameraID = "+mCameraId);
     }
-
-
 
     private ImageReader mImageReader;
     private Handler childHandler;
@@ -544,7 +551,6 @@ public class RecordDelegate implements CameraDelegate {
             @Override
             public void onImageAvailable(ImageReader reader) {
 //                mCameraDevice.close();
-                // 拿到拍照照片数据
                 Image image = reader.acquireNextImage();
                 ByteBuffer buffer = image.getPlanes()[0].getBuffer();
                 byte[] bytes = new byte[buffer.remaining()];
@@ -555,6 +561,7 @@ public class RecordDelegate implements CameraDelegate {
                         mCallback.onCaptureResult(bitmap);
                     }
                 }
+                //這裏不快速image.close()會導致相機surface刷新卡死
                 image.close();
             }
         }, mainHandler);

@@ -1,9 +1,17 @@
 package com.pm.cameraui.utils;
 
+import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import VideoHandle.EpEditor;
+import VideoHandle.EpVideo;
+import VideoHandle.OnEditorListener;
 
 /**
  * @author pm
@@ -11,6 +19,8 @@ import android.util.Log;
  * @email puming@zdsoft.cn
  */
 public class Utility {
+
+    public static final String TAG = "RAMBO";
     public static final int STATE_RECORDING = -1;
     public static final int STATE_NO_PERMISSION = -2;
     public static final int STATE_SUCCESS = 1;
@@ -74,4 +84,7 @@ public class Utility {
             }
         }
     }
+
+
+
 }
