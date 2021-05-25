@@ -15,7 +15,7 @@ public class TimeUtil {
      */
     public static String formatTime(long ms) {
         if (ms == 0) {
-        return "";
+        return "00:00:00";
         }
         int ss = 1000;
         int mi = ss * 60;
