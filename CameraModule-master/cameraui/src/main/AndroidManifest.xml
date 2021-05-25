@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <!--声明必须的特性-->
     <uses-feature
@@ -13,12 +14,17 @@
         android:required="true" />
     <uses-feature android:name="android.hardware.camera2.full" />
 
-    <application>
+    <application android:usesCleartextTraffic="true"
+        android:name=".InspectApp">
         <activity android:name=".CameraActivity"
             android:screenOrientation="landscape">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
+        </activity>
+
+        <activity android:name=".mvp.MVPActivity"
+            android:screenOrientation="landscape">
         </activity>
     </application>
 </manifest>

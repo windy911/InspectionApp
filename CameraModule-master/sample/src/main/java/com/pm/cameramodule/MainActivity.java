@@ -6,12 +6,15 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.pm.cameraui.CameraActivity;
+import com.pm.cameraui.base.BaseActivity;
+import com.pm.cameraui.bean.UserInfo;
+import com.pm.cameraui.mvp.MainPresenter;
+import com.pm.cameraui.mvp.MainView;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends BaseActivity<MainPresenter> implements MainView {
 
     EditText edtLoginName;
     EditText edtLoginPswd;
@@ -19,14 +22,27 @@ public class MainActivity extends AppCompatActivity{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(R.layout.activity_main);
-        initView();
+        super.onCreate(savedInstanceState);
     }
 
-    private void initView() {
+    @Override
+    protected MainPresenter createPresenter() {
+        return new MainPresenter(this);
+    }
+
+    @Override
+    protected int getLayoutId() {
+        return R.layout.activity_main;
+    }
+
+    @Override
+    protected void addListener() {
+
+    }
+
+    public void initView() {
         edtLoginName = findViewById(R.id.edtLoginName);
         edtLoginPswd = findViewById(R.id.edtLoginPswd);
         btnLogin = findViewById(R.id.btnLogin);
@@ -38,8 +54,18 @@ public class MainActivity extends AppCompatActivity{
         });
     }
 
-    public void login(){
-        startActivity(CameraActivity.newIntent(MainActivity.this,CameraActivity.TYPE_VIDEO));
+    public void login() {
+        presenter.login(edtLoginName.getText().toString().trim(), edtLoginPswd.getText().toString().trim());
+
     }
 
+    @Override
+    public void onLogin(UserInfo o) {
+
+        Toast.makeText(getApplication(), "登录成功！" + o.getUserId(), Toast.LENGTH_SHORT).show();
+
+        startActivity(CameraActivity.newIntent(MainActivity.this, CameraActivity.TYPE_VIDEO));
+
+        //        startActivity(new Intent(MainActivity.this, MVPActivity.class));
+    }
 }

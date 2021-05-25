@@ -22,7 +22,6 @@ import com.pm.cameraui.utils.UploadUtil;
 import com.pm.cameraui.widget.AutoFitTextureView;
 import com.pm.cameraui.widget.CameraController;
 import com.pm.cameraui.widget.MyVidoeController;
-import com.pm.cameraui.widget.VideoViewController;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
