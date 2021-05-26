@@ -16,12 +16,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.obs.services.model.ProgressListener;
+import com.obs.services.model.ProgressStatus;
 import com.pm.cameracore.DelegateCallback;
 import com.pm.cameracore.RecordDelegate;
+import com.pm.cameraui.base.BaseFragment;
+import com.pm.cameraui.base.BasePresenter;
+import com.pm.cameraui.bean.InspectRecord;
+import com.pm.cameraui.mvp.MvpPresenter;
+import com.pm.cameraui.mvp.VideoPresenter;
+import com.pm.cameraui.mvp.VideoView;
+import com.pm.cameraui.utils.MarkUtil;
+import com.pm.cameraui.utils.RecordUtil;
+import com.pm.cameraui.utils.TimeUtil;
 import com.pm.cameraui.utils.UploadUtil;
 import com.pm.cameraui.widget.AutoFitTextureView;
 import com.pm.cameraui.widget.CameraController;
 import com.pm.cameraui.widget.MyVidoeController;
+import com.pm.cameraui.widget.ShareDialog;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -35,7 +47,7 @@ import java.util.TimerTask;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-public class VideoFragment extends BaseCameraFragment implements DelegateCallback {
+public class VideoFragment extends BaseFragment<VideoPresenter> implements DelegateCallback , VideoView {
 
     private AutoFitTextureView mTextureView;
     private CameraController mController;
@@ -61,8 +73,30 @@ public class VideoFragment extends BaseCameraFragment implements DelegateCallbac
     }
 
     @Override
+    protected VideoPresenter createPresenter() {
+          return new VideoPresenter(this);
+    }
+
+    @Override
+    protected int getLayoutId() {
+        return 0;
+    }
+
+    @Override
+    protected void addListener() {
+
+    }
+
+    @Override
+    protected void initView() {
+
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        presenter.getAppConfiguration();
     }
 
     @Nullable
@@ -89,9 +123,7 @@ public class VideoFragment extends BaseCameraFragment implements DelegateCallbac
 
             @Override
             public void recordStart() {
-                isLastVideoPath = false;
-                clearSaveList();
-                startRecording();
+                 startNewInspectRecord();
             }
 
             @Override
@@ -292,6 +324,7 @@ public class VideoFragment extends BaseCameraFragment implements DelegateCallbac
             public void onMergeSuccess(String outFile) {
                 Log.d("RAMBO", "合成成功了文件：" + outFile);
                 clearSaveList();
+                stopInspectionTopic(outFile);
             }
         });
     }
@@ -358,4 +391,72 @@ public class VideoFragment extends BaseCameraFragment implements DelegateCallbac
             startTimer = System.currentTimeMillis();
         }
     }
+
+    @Override
+    public void showJsonText(String text) {
+
+    }
+
+
+
+    InspectRecord inspectRecord;
+    //启动一个新的任务
+    public void startNewInspectRecord(){
+        inspectRecord = new InspectRecord();
+        inspectRecord.setStartTimeLong(System.currentTimeMillis());
+        inspectRecord.setStartTime(TimeUtil.getFormatDateTime(inspectRecord.getStartTimeLong()));
+        if (Constants.CURRENT_TOPIC != null) {
+            inspectRecord.setTopicId(Constants.CURRENT_TOPIC.getId());
+        } else {
+            //这里根据选择场景的TopicID来填入，139是硬编码“车间巡检”
+            inspectRecord.setTopicId(139l);
+        }
+        presenter.newInspectRecord(inspectRecord);
+    }
+
+
+    //启动一个新任务成功了
+    @Override
+    public void newInspectionTopic(InspectRecord record) {
+                isLastVideoPath = false;
+                clearSaveList();
+                startRecording();
+                inspectRecord = record;
+    }
+
+    //关闭当前InspcetionTopic任务，上传数据。显示对话框。拿到了合并后的视频文件地址，还有更新录制时长。
+    public void stopInspectionTopic(String videoFilePath){
+        inspectRecord = RecordUtil.endRecord(inspectRecord);
+
+
+        new ShareDialog(inspectRecord)
+                .setTitle("完成巡检记录")
+                .setConfirm("立即上传")
+                .setCancel("稍后上传")
+                .setDialogCancelable(false)
+                .setOnCertainButtonClickListener(new ShareDialog.OnCertainButtonClickListener() {
+                    @Override
+                    public void onCertainButtonClick() {
+                        uploadVideoFileToHuaWei(videoFilePath);
+                    }
+                }).show(getFragmentManager(),"CommonDialog");
+
+    }
+
+    public void uploadVideoFileToHuaWei(String videoFilePath){
+        UploadUtil.upload(videoFilePath, new ProgressListener() {
+            @Override
+            public void progressChanged(ProgressStatus progressStatus) {
+                Log.d("RAMBO progressChanged ",progressStatus.toString());
+            }
+        }, new UploadUtil.OnUploadsListener() {
+            @Override
+            public void onUploadSuccess(String localPath, String remoteUrl) {
+                inspectRecord.setLocalVideoFilePath(localPath);
+                inspectRecord.setVideoUrl(remoteUrl);
+                presenter.updateInspectRecord(inspectRecord);
+            }
+        });
+    }
+
 }

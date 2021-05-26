@@ -72,6 +72,7 @@ dependencies {
     implementation 'org.jetbrains:annotations:15.0'
     implementation 'org.jetbrains:annotations:15.0'
     implementation 'org.jetbrains:annotations:15.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.3'
     implementation 'com.github.getActivity:ToastUtils:9.2'
 

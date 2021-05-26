@@ -9,7 +9,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.pm.cameraui.CameraActivity;
+import com.pm.cameraui.Constants;
 import com.pm.cameraui.base.BaseActivity;
+import com.pm.cameraui.bean.AppConfig;
 import com.pm.cameraui.bean.UserInfo;
 import com.pm.cameraui.mvp.MainPresenter;
 import com.pm.cameraui.mvp.MainView;
@@ -61,9 +63,8 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainVie
 
     @Override
     public void onLogin(UserInfo o) {
-
         Toast.makeText(getApplication(), "登录成功！" + o.getUserId(), Toast.LENGTH_SHORT).show();
-
+        Constants.userInfo = o;
         startActivity(CameraActivity.newIntent(MainActivity.this, CameraActivity.TYPE_VIDEO));
 
         //        startActivity(new Intent(MainActivity.this, MVPActivity.class));

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="transparent">#00FF00FF</color>
+    <color name="white">#ffffff</color>
+    <color name="blue">#4266F5</color>
+    <color name="color_c6ffffff">#C6FFFFFF</color>
+    <color name="color_1bcd1e">#1BCD1E</color>
+    <color name="color_4CAF50">#4CAF50</color>
+    <color name="color_white">#ffffff</color>
+    <color name="color_transparent">#00ffffff</color>
+    <color name="color_blue">#4266F5</color>
+    <color name="color_blue_press">#D84266F5</color>
+    <color name="color_blue_disable">#DCE0F9</color>
+    <color name="color_f5f6fc">#f5f6fc</color>
+    <color name="color_B4B6C0">#B4B6C0</color>
+    <color name="black">#000000</color>
+    <color name="gray_999999">#999999</color>
+    <color name="color_E6FFFFFF">#E6FFFFFF</color>
+    <color name="color_33ccd3f1">#33ccd3f1</color>
+    <color name="black_333333">#333333</color>
+    <color name="black_666666">#666666</color>
+    <color name="gray_b2b4be">#B2B4BE</color>
+    <color name="red">#ff0000</color>
+    <color name="gray_88888d">#88888D</color>
+    <color name="red_dd3333">#DD3333</color>
+    <color name="color_blue_ccd3f1">#CCD3F1</color>
+    <color name="color_ebf841">#FFBF7E74</color>
+    <color name="color_43e247">#B791CA92</color>
+    <color name="color_f4f4f4">#f4f4f4</color>
+    <color name="black_dddddd">#dddddd</color>
+</resources>
