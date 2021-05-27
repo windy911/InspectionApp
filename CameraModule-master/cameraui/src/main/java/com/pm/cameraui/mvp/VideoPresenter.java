@@ -7,6 +7,7 @@ import com.pm.cameraui.base.BaseObserver;
 import com.pm.cameraui.base.BasePresenter;
 import com.pm.cameraui.bean.AppConfig;
 import com.pm.cameraui.bean.InspectRecord;
+import com.pm.cameraui.bean.Mark;
 import com.pm.cameraui.bean.Topic;
 import com.pm.cameraui.bean.UserInfo;
 
@@ -91,6 +92,20 @@ public class VideoPresenter extends BasePresenter<VideoView> {
             @Override
             public void onSuccess(InspectRecord o) {
                 baseView.showJsonText(new Gson().toJson(o));
+            }
+            @Override
+            public void onError(String msg) {
+                baseView.showError(msg);
+            }
+        });
+    }
+
+
+    public void addMarkRecord(Mark mark){
+        addDisposable(apiServer.addMarkRecord(mark), new BaseObserver<Mark>(baseView) {
+            @Override
+            public void onSuccess(Mark o) {
+                baseView.addMarkRecord(o);
             }
             @Override
             public void onError(String msg) {

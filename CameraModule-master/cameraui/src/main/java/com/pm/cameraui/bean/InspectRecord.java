@@ -9,7 +9,7 @@ public class InspectRecord {
 //    @Id(autoincrement = true)
     private Long _id;
     /**
-     * "createBy": 0,
+     *  "createBy": 0,
      * 	"createDate": "",
      * 	"duration": 0,
      * 	"endTime": "",
@@ -35,8 +35,10 @@ public class InspectRecord {
     private String updateBy;
     private String updateDate;
     private String name;
+    //工作场景ID
     private Long topicId;
     private Integer labels;
+    //轨迹
     private String traceLocus;
     private String ownerCompnay;
     /**
@@ -51,9 +53,6 @@ public class InspectRecord {
     private Long endTimeLong;
     private String endTime;
     private String duration;
-
-
-
 
     private int revision;
     private String updatedBy;

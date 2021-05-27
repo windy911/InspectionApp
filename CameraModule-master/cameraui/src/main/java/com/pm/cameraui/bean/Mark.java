@@ -7,7 +7,7 @@ package com.pm.cameraui.bean;
 //@Entity
 public class Mark {
     /**
-     * "audioText": "",
+     *  "audioText": "",
      * 	"audioUrl": "",
      * 	"createBy": 0,
      * 	"createDate": "",
@@ -201,6 +201,30 @@ public class Mark {
     public void setMarkType(int markType) {
         this.markType = markType;
     }
-    
-   
+
+    @Override
+    public String toString() {
+        return "Mark{" +
+                "audioText='" + audioText + '\'' +
+                ", audioUrl='" + audioUrl + '\'' +
+                ", createBy=" + createBy +
+                ", createDate='" + createDate + '\'' +
+                ", duration=" + duration +
+                ", endTime='" + endTime + '\'' +
+                ", endTimeLong=" + endTimeLong +
+                ", id=" + id +
+                ", markedObjId=" + markedObjId +
+                ", name='" + name + '\'' +
+                ", pictureLocalPath='" + pictureLocalPath + '\'' +
+                ", rank=" + rank +
+                ", startTime='" + startTime + '\'' +
+                ", startTimeLong=" + startTimeLong +
+                ", tagPicUrl='" + tagPicUrl + '\'' +
+                ", updateBy=" + updateBy +
+                ", updateDate='" + updateDate + '\'' +
+                ", vedioLocalPath='" + vedioLocalPath + '\'' +
+                ", vedioUrl='" + vedioUrl + '\'' +
+                ", markType=" + markType +
+                '}';
+    }
 }

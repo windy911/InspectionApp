@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.hjq.toast.ToastUtils;
 import com.obs.services.model.ProgressListener;
 import com.obs.services.model.ProgressStatus;
 import com.pm.cameracore.DelegateCallback;
@@ -23,11 +24,14 @@ import com.pm.cameracore.RecordDelegate;
 import com.pm.cameraui.base.BaseFragment;
 import com.pm.cameraui.base.BasePresenter;
 import com.pm.cameraui.bean.InspectRecord;
+import com.pm.cameraui.bean.Mark;
 import com.pm.cameraui.mvp.MvpPresenter;
 import com.pm.cameraui.mvp.VideoPresenter;
 import com.pm.cameraui.mvp.VideoView;
+import com.pm.cameraui.utils.FileUtils;
 import com.pm.cameraui.utils.MarkUtil;
 import com.pm.cameraui.utils.RecordUtil;
+import com.pm.cameraui.utils.StringUtils;
 import com.pm.cameraui.utils.TimeUtil;
 import com.pm.cameraui.utils.UploadUtil;
 import com.pm.cameraui.widget.AutoFitTextureView;
@@ -56,6 +60,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     private boolean isLastVideoPath = false;
     private long startTimer = System.currentTimeMillis();
     private long periodTime = 0;
+    private long savePeriodTime =0;
 
     private List<String> recordFileList = new ArrayList<>();
 
@@ -118,11 +123,16 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         myVideoController.setControllerCallback(new CameraController.ControllerCallback() {
             @Override
             public void takePicture() {
-                mRecordDelegate.takePicture();
+//                mRecordDelegate.takePicture();
+                markRecord();
             }
 
             @Override
             public void recordStart() {
+//                isLastVideoPath = false;
+//                clearSaveList();
+//                startRecording();
+
                  startNewInspectRecord();
             }
 
@@ -285,7 +295,18 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     @Override
     public void onCaptureResult(Bitmap bitmap) {
         if (bitmap != null) {
-            Log.d("RAMBO", "onCaptureResult: bitmap count = " + bitmap.getByteCount());
+            Log.d("RAMBO", "拍照回调成功！ onCaptureResult: bitmap count = " + bitmap.getByteCount());
+
+            String filePath = createImageFilePath(getActivity());
+            String saveFile = FileUtils.saveBitmapToFile(filePath,bitmap);
+            if(!TextUtils.isEmpty(saveFile)){
+                UploadUtil.uploadImage(filePath, new UploadUtil.OnUploadsListener() {
+                    @Override
+                    public void onUploadSuccess(String localPath, String remoteUrl) {
+                        updateRecord(localPath,remoteUrl);
+                    }
+                });
+            }
         }
         myVideoController.setPreViewImage(bitmap);
     }
@@ -336,6 +357,13 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         return (dir == null ? "" : (dir.getAbsolutePath() + "/")) + dateStr + ".mp4";
     }
 
+    private String createImageFilePath(Context context){
+        final File dir = context.getExternalFilesDir(Environment.DIRECTORY_MOVIES);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSSS", Locale.getDefault());
+        String dateStr = dateFormat.format(new Date());
+        return (dir == null ? "" : (dir.getAbsolutePath() + "/")) + dateStr + ".jpg";
+    }
+
     Timer timer;
     TimerTask task;
     Handler handler = new Handler() {
@@ -381,6 +409,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     }
 
     private void resetUI() {
+        savePeriodTime = periodTime;
         periodTime = 0;
         refreshTimer();
     }
@@ -426,9 +455,8 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
 
     //关闭当前InspcetionTopic任务，上传数据。显示对话框。拿到了合并后的视频文件地址，还有更新录制时长。
     public void stopInspectionTopic(String videoFilePath){
-        inspectRecord = RecordUtil.endRecord(inspectRecord);
-
-
+        //用savePeriodTime来记录最后清零前的计时器数据
+        inspectRecord = RecordUtil.endRecord(inspectRecord,savePeriodTime);
         new ShareDialog(inspectRecord)
                 .setTitle("完成巡检记录")
                 .setConfirm("立即上传")
@@ -459,4 +487,21 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         });
     }
 
+    //添加标签，首先拍照等回调
+    public void markRecord(){
+        ToastUtils.show("标记处理中...");
+        mRecordDelegate.takePicture();
+    }
+    public void updateRecord(String localPath,String imgUrl){
+        Mark mark = MarkUtil.singleImageMark(inspectRecord,localPath,imgUrl,periodTime);
+        if(mark!=null){
+            presenter.addMarkRecord(mark);
+        }
+    }
+
+    @Override
+    public void addMarkRecord(Mark mark) {
+        Log.d("RAMBO","新增Mark成功："+mark.toString());
+        ToastUtils.show("新增图片Mark成功："+mark.getId());
+    }
 }

@@ -20,12 +20,16 @@ public class RecordUtil {
         return record;
     }
 
-    public static InspectRecord endRecord(InspectRecord record){
+    public static InspectRecord endRecord(InspectRecord record,long periodTime){
         if (record == null) return null;
-        endTimeLong = System.currentTimeMillis();
-        endTime = TimeUtil.getFormatDateTime(endTimeLong);
+
         startTimeLong = record.getStartTimeLong();
         startTime = record.getStartTime();
+
+        endTimeLong = startTimeLong+periodTime;
+        endTime = TimeUtil.getFormatDateTime(endTimeLong);
+
+
         record.setEndTimeLong(endTimeLong);
         record.setEndTime(endTime);
         record.setStartTime(TimeUtil.getFormatDateTime(endTimeLong));

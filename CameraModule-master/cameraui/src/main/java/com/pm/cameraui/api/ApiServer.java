@@ -46,13 +46,14 @@ public interface ApiServer {
 
     /**
      * 新增工作记录
+     * 每次启动录制前，都会先带场景ID请求接口创建工作记录，再进行下一步。
      */
     @POST("worksiterecord-record-srv/inspectionRecord/insert")
     Observable<InspectRecord> addInspectRecord(@Body InspectRecord inspectRecord);
 
 
     /**
-     *更新工作记录
+     * 更新工作记录
      *视频录制完成对话框后，更新结束时间数据后做Update操作
      */
     @POST("worksiterecord-record-srv/inspectionRecord/update")

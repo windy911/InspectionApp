@@ -1,5 +1,7 @@
 package com.pm.cameraui.utils;
 
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.text.TextUtils;
 
 import java.io.BufferedReader;
@@ -464,9 +466,9 @@ public class FileUtils {
      * @return true if the necessary directories have been created or the target directory already exists, false one of
      *         the directories can not be created.
      *         <ul>
-     *         <li>if {@link com.inspection.basic.utils.FileUtils#getFolderName(String)} return null, return false</li>
+     *         <li>if {@link  FileUtils#getFolderName(String)} return null, return false</li>
      *         <li>if target directory already exists, return true</li>
-     *         <li>return {@link File#makeFolder}</li>
+     *         <li>return
      *         </ul>
      */
     public static boolean makeDirs(String filePath) {
@@ -571,5 +573,35 @@ public class FileUtils {
 
         File file = new File(path);
         return (file.exists() && file.isFile() ? file.length() : -1);
+    }
+
+
+
+    /**
+     * androidQ中默认项目私有文件只能存储在Android/data/包名/files/下
+     * @param bitmap         要保存的bitmap
+     * @param fileName       图片名称
+     * @return 该图片的绝对路径，不是Uri相对路径
+     */
+    public static String saveBitmapToFile(String fileName,Bitmap bitmap) {
+
+//        File file = getPickerFileDirectory(context);
+//        file = new File(file, fileName + "." + compressFormat.toString().toLowerCase());
+
+        File file = new File(fileName);
+        if(file==null){return "";}
+        try {
+            FileOutputStream b = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, b);// 把数据写入文件
+            b.flush();
+            b.close();
+            return fileName;
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (file.exists()) {
+                file.delete();
+            }
+        }
+        return "";
     }
 }
