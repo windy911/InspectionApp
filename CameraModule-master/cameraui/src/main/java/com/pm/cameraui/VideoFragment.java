@@ -51,7 +51,7 @@ import java.util.TimerTask;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-public class VideoFragment extends BaseFragment<VideoPresenter> implements DelegateCallback , VideoView {
+public class VideoFragment extends BaseFragment<VideoPresenter> implements DelegateCallback, VideoView {
 
     private AutoFitTextureView mTextureView;
     private CameraController mController;
@@ -60,7 +60,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     private boolean isLastVideoPath = false;
     private long startTimer = System.currentTimeMillis();
     private long periodTime = 0;
-    private long savePeriodTime =0;
+    private long savePeriodTime = 0;
 
     private List<String> recordFileList = new ArrayList<>();
 
@@ -79,7 +79,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
 
     @Override
     protected VideoPresenter createPresenter() {
-          return new VideoPresenter(this);
+        return new VideoPresenter(this);
     }
 
     @Override
@@ -133,7 +133,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
 //                clearSaveList();
 //                startRecording();
 
-                 startNewInspectRecord();
+                startNewInspectRecord();
             }
 
             @Override
@@ -298,12 +298,12 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
             Log.d("RAMBO", "拍照回调成功！ onCaptureResult: bitmap count = " + bitmap.getByteCount());
 
             String filePath = createImageFilePath(getActivity());
-            String saveFile = FileUtils.saveBitmapToFile(filePath,bitmap);
-            if(!TextUtils.isEmpty(saveFile)){
+            String saveFile = FileUtils.saveBitmapToFile(filePath, bitmap);
+            if (!TextUtils.isEmpty(saveFile)) {
                 UploadUtil.uploadImage(filePath, new UploadUtil.OnUploadsListener() {
                     @Override
                     public void onUploadSuccess(String localPath, String remoteUrl) {
-                        updateRecord(localPath,remoteUrl);
+                        updateRecord(localPath, remoteUrl);
                     }
                 });
             }
@@ -357,7 +357,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         return (dir == null ? "" : (dir.getAbsolutePath() + "/")) + dateStr + ".mp4";
     }
 
-    private String createImageFilePath(Context context){
+    private String createImageFilePath(Context context) {
         final File dir = context.getExternalFilesDir(Environment.DIRECTORY_MOVIES);
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSSS", Locale.getDefault());
         String dateStr = dateFormat.format(new Date());
@@ -427,10 +427,10 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     }
 
 
-
     InspectRecord inspectRecord;
+
     //启动一个新的任务
-    public void startNewInspectRecord(){
+    public void startNewInspectRecord() {
         inspectRecord = new InspectRecord();
         inspectRecord.setStartTimeLong(System.currentTimeMillis());
         inspectRecord.setStartTime(TimeUtil.getFormatDateTime(inspectRecord.getStartTimeLong()));
@@ -447,16 +447,16 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     //启动一个新任务成功了
     @Override
     public void newInspectionTopic(InspectRecord record) {
-                isLastVideoPath = false;
-                clearSaveList();
-                startRecording();
-                inspectRecord = record;
+        isLastVideoPath = false;
+        clearSaveList();
+        startRecording();
+        inspectRecord = record;
     }
 
     //关闭当前InspcetionTopic任务，上传数据。显示对话框。拿到了合并后的视频文件地址，还有更新录制时长。
-    public void stopInspectionTopic(String videoFilePath){
+    public void stopInspectionTopic(String videoFilePath) {
         //用savePeriodTime来记录最后清零前的计时器数据
-        inspectRecord = RecordUtil.endRecord(inspectRecord,savePeriodTime);
+        inspectRecord = RecordUtil.endRecord(inspectRecord, savePeriodTime);
         new ShareDialog(inspectRecord)
                 .setTitle("完成巡检记录")
                 .setConfirm("立即上传")
@@ -467,15 +467,15 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
                     public void onCertainButtonClick() {
                         uploadVideoFileToHuaWei(videoFilePath);
                     }
-                }).show(getFragmentManager(),"CommonDialog");
+                }).show(getFragmentManager(), "CommonDialog");
 
     }
 
-    public void uploadVideoFileToHuaWei(String videoFilePath){
+    public void uploadVideoFileToHuaWei(String videoFilePath) {
         UploadUtil.upload(videoFilePath, new ProgressListener() {
             @Override
             public void progressChanged(ProgressStatus progressStatus) {
-                Log.d("RAMBO progressChanged ",progressStatus.toString());
+                Log.d("RAMBO progressChanged ", progressStatus.toString());
             }
         }, new UploadUtil.OnUploadsListener() {
             @Override
@@ -488,20 +488,45 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     }
 
     //添加标签，首先拍照等回调
-    public void markRecord(){
+    public void markRecord() {
         ToastUtils.show("标记处理中...");
         mRecordDelegate.takePicture();
     }
-    public void updateRecord(String localPath,String imgUrl){
-        Mark mark = MarkUtil.singleImageMark(inspectRecord,localPath,imgUrl,periodTime);
-        if(mark!=null){
+
+    public void updateRecord(String localPath, String imgUrl) {
+        Mark mark = MarkUtil.singleImageMark(inspectRecord, localPath, imgUrl, periodTime);
+        if (mark != null) {
             presenter.addMarkRecord(mark);
         }
     }
 
     @Override
     public void addMarkRecord(Mark mark) {
-        Log.d("RAMBO","新增Mark成功："+mark.toString());
-        ToastUtils.show("新增图片Mark成功："+mark.getId());
+        Log.d("RAMBO", "新增Mark成功：" + mark.toString());
+        ToastUtils.show("标记成功");
+        //最后提交的时候，显示Mark数 +1
+        inspectRecord.setLabels(inspectRecord.getLabels() + 1);
     }
+
+    //     * 1、长按，抬起 结束标记
+    //     * 2、长按超过20秒，结束标记
+    long audioStartTime;
+    long audioStartTimeLong;
+    long audioEndTime;
+    long audioEndTimeLong;
+    String audioMarkImagePath;
+    String audioMarkImageURL;
+
+    //本地开ArrayList记录Mark，然后再分段切取的时候，读取上传更新Mark。
+    //长按开启时，启动倒计时20秒Progress，同时生成图片打点记录，汇总到声音打点记录一起上报mark
+    public void endVoiceMark() {
+        audioEndTime = periodTime / 1000;
+        audioEndTimeLong = System.currentTimeMillis();
+        Mark mark = MarkUtil.withAudioMark(inspectRecord, audioMarkImagePath, audioMarkImageURL, audioStartTime, audioEndTime, audioStartTimeLong, audioEndTimeLong);
+        if (mark != null) {
+            presenter.addMarkRecord(mark);
+        }
+    }
+
+
 }
