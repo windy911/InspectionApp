@@ -22,18 +22,12 @@ public class RecordUtil {
 
     public static InspectRecord endRecord(InspectRecord record,long periodTime){
         if (record == null) return null;
-
-        startTimeLong = record.getStartTimeLong();
-        startTime = record.getStartTime();
-
-        endTimeLong = startTimeLong+periodTime;
+        endTimeLong = record.getStartTimeLong()+periodTime;
         endTime = TimeUtil.getFormatDateTime(endTimeLong);
-
-
+        startTimeLong = record.getStartTimeLong();
+        startTime = TimeUtil.getFormatDateTime(startTimeLong);
         record.setEndTimeLong(endTimeLong);
         record.setEndTime(endTime);
-        record.setStartTime(TimeUtil.getFormatDateTime(endTimeLong));
-        record.setEndTime(TimeUtil.getFormatDateTime(startTimeLong));
         record.setDuration(String.valueOf(endTimeLong - startTimeLong));
         return record;
     }

@@ -75,7 +75,8 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.3'
     implementation 'com.github.getActivity:ToastUtils:9.2'
-
+    implementation 'com.hyman:flowlayout-lib:1.1.2'
+    implementation 'androidx.recyclerview:recyclerview:1.2.0-alpha03'
 
 }
 

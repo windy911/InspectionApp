@@ -1,8 +1,11 @@
 package com.pm.cameraui.utils;
 
 
+import android.util.Log;
+
 import com.pm.cameraui.bean.InspectRecord;
 import com.pm.cameraui.bean.Mark;
+import com.pm.cameraui.mvp.VideoPresenter;
 
 import java.io.File;
 import java.util.List;
@@ -54,55 +57,89 @@ public class MarkUtil {
 //        }
 //    }
 
-//    /**
-//     * 从视频文件中提取音频并更新到Mark表，每次结束录制时后台进行
-//     * @param record
-//     */
-//    public static void generateAudioForMarks(InspectRecord record, InspectVM inspectVM){
-//
-//        List<Mark> markList = DaoManager.getInstance().getSession().getMarkDao().queryBuilder().where(MarkDao.Properties.MarkedObjId.eq(record.getId())).list();
-//        ExecutorService threadPool = Executors.newCachedThreadPool();
-//
-//        Runnable markTask = new Runnable() {
-//            @Override
-//            public void run() {
-//                for(Mark mark :markList){
-//                    //循环把为上传的标记做适配剪辑和上传
-//                    if (StringUtils.isEmpty(mark.getVedioUrl())){
-//                        float duration = mark.getEndTimeLong() - mark.getStartTimeLong();
-//                        FFmpegUtil.clipVideo(record.getLocalVideoFilePath(),mark.getStartTimeLong(),duration,new FFmpegUtil.OnVideoClipListener(){
-//
-//                            @Override
-//                            public void onClipSuccess(File outFile) {
-//                                //上传剪辑的视频文件
-//                                UploadUtil.upload(outFile.getAbsolutePath(),  null, (localPath, remoteUrl) -> {
-//                                    mark.setVedioUrl(remoteUrl);
-//                                    mark.setVedioLocalPath(outFile.getAbsolutePath());
-//                                    DaoManager.getInstance().getSession().getMarkDao().update(mark);
-//                                    inspectVM.updateMarkRecord(mark);
-////                                    inspectVM.transferMarkMp4(record.getVideoUrl(),mark);
-////
-////                                    List<Mark> list = DaoManager.getInstance().getSession().getMarkDao().queryBuilder().where(MarkDao.Properties.MarkedObjId.eq(record.getId())).list();
-////                                    if (list.size() == 0){
-////                                        record.setHasUndoMarks(false);
-////                                        DaoManager.getInstance().getSession().getInspectRecordDao().update(record);
-////                                    }
-//
-//                                });
-//                            }
-//
-//                            @Override
-//                            public void onClipFail() {
-//                                //忽略错误，下次继续上传
-//                            }
-//                        });
-//                    }
-//                }
-//            }
-//        };
-//
-//        threadPool.execute(markTask);
-//    }
+    /**
+     * 从视频文件中提取音频并更新到Mark表，每次结束录制时后台进行
+     * @param record
+     */
+    public static int markUploadCount = 0;
+    public static void generateAudioForMarks(InspectRecord record, List<Mark> markList, VideoPresenter presenter){
+
+        resetUploadCount();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+//              List<Mark> markList = DaoManager.getInstance().getSession().getMarkDao().queryBuilder().where(MarkDao.Properties.MarkedObjId.eq(record.getId())).list();
+                ExecutorService threadPool = Executors.newCachedThreadPool();
+                for(Mark mark :markList){
+                    //循环把为上传的标记做适配剪辑和上传
+                    if (!mark.getStartTimeLong().equals(mark.getEndTimeLong()) && StringUtils.isEmpty(mark.getVedioUrl())){
+                        Log.e("MarkUpload","markid="+mark.getId()+"开始处理");
+                        Runnable markTask = new Runnable() {
+                            @Override
+                            public void run() {
+                                addUploadCount();
+                                float duration = mark.getEndTimeLong() - mark.getStartTimeLong();
+                                FFmpegUtil.clipVideo(record.getLocalVideoFilePath(),mark.getStartTimeLong(),duration,new FFmpegUtil.OnVideoClipListener(){
+                                    @Override
+                                    public void onClipSuccess(File outFile) {
+                                        //上传剪辑的视频文件
+                                        Log.e("MarkUpload","markid="+mark.getId()+"文件剪辑成功");
+                                        UploadUtil.upload(outFile.getAbsolutePath(),  null, (localPath, remoteUrl) -> {
+                                            mark.setVedioUrl(remoteUrl);
+                                            Log.e("MarkUpload","markid="+mark.getId()+"文件上传成功");
+                                            mark.setVedioLocalPath(outFile.getAbsolutePath());
+//                                            DaoManager.getInstance().getSession().getMarkDao().update(mark);
+//                                            inspectVM.updateMarkRecord(mark);
+                                            delUploadCount();
+                                            presenter.updateMarkRecord(mark);
+                                        });
+                                    }
+                                    @Override
+                                    public void onClipFail() {
+                                        delUploadCount();
+                                        //忽略错误，下次继续上传
+                                    }
+                                });
+                            }
+                        };
+                        threadPool.execute(markTask);
+                        try {
+                            if(isFinishUpload()){
+                                presenter.updateMarkRecord(null);
+                            }
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                //没有需要分割上传的VoiceMark，直接就Finish。
+                if(isFinishUpload()){
+                    presenter.updateMarkRecord(null);
+                }
+            }
+        }).start();
+
+    }
+
+    public static void delUploadCount(){
+        if(markUploadCount>0){
+            markUploadCount-=1;
+        }
+        Log.d("RAMBO","delUploadCount markUploadCount = " + markUploadCount);
+    }
+    public static void addUploadCount(){
+        markUploadCount+=1;
+        Log.d("RAMBO","addUploadCount markUploadCount = " + markUploadCount);
+    }
+    public static void resetUploadCount(){
+        markUploadCount = 0;
+        Log.d("RAMBO","resetUploadCount markUploadCount = " + markUploadCount);
+    }
+    public static boolean isFinishUpload(){
+        return markUploadCount == 0;
+    }
 
 //    /**
 //     * 每次启动扫描码数据库里面有没有为上传完成的标记

@@ -1,23 +1,26 @@
 package com.pm.cameraui;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 
 public class CameraActivity extends AppCompatActivity {
     private static final String CAMERA_TYPE_INTENT_NAME = "camera_type";
     public static final String TYPE_PICTURE = "picture";
     public static final String TYPE_VIDEO = "video";
+    public Fragment fragment;
+    public static CameraActivity instance = null;
 
     public static Intent newIntent(Context context, String cameraType) {
         Intent intent = new Intent(context, CameraActivity.class);
@@ -28,13 +31,15 @@ public class CameraActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        instance = this;
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_camera);
         String cameraType = getIntent().getStringExtra(CAMERA_TYPE_INTENT_NAME);
         if (null == savedInstanceState) {
+            fragment = VideoFragment.newInstance();
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.container, cameraType.equals(TYPE_PICTURE) ? PictureFragment.newInstance() : VideoFragment.newInstance())
+                    .replace(R.id.container, cameraType.equals(TYPE_PICTURE) ? PictureFragment.newInstance() : fragment)
                     .commit();
         }
     }
@@ -42,6 +47,16 @@ public class CameraActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        hideNavigation();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        hideNavigation();
+    }
+
+    public void hideNavigation(){
         //全屏显示
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             View decorView = getWindow().getDecorView();
@@ -72,6 +87,7 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     public void showExitDialog(){
+
         AlertDialog.Builder builder = new AlertDialog.Builder(CameraActivity.this);
         builder.setTitle("提示：");
         builder.setMessage("确认要退出吗？");
@@ -88,9 +104,30 @@ public class CameraActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
+                hideNavigation();
             }
         });
         AlertDialog dialog = builder.create();
         dialog.show();
+        hideNavigation();
     }
+
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(KeyEvent.KEYCODE_ALL_APPS == keyCode){
+            ((VideoFragment)fragment).onVoiceKeyDown();
+        }
+        return super.onKeyDown(keyCode, event);
+
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        if(KeyEvent.KEYCODE_ALL_APPS == keyCode){
+            ((VideoFragment)fragment).onVoiceKeyUp();
+        }
+        return super.onKeyUp(keyCode, event);
+    }
+
 }

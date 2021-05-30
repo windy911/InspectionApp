@@ -4,10 +4,12 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -21,6 +23,8 @@ public class MyVidoeController extends RelativeLayout {
     LinearLayout llRecording;
     ImageView imgPreview;
     TextView tvRedDot,tvTimer;
+     ProgressBar voiceProgress;
+    LinearLayout llVoiceMark;
 
 
     public MyVidoeController(Context context) {
@@ -47,10 +51,16 @@ public class MyVidoeController extends RelativeLayout {
         llRecording = findViewById(R.id.llRecording);
         btnCameraSwitch = findViewById(R.id.btnSwitchCamera);
         btnTakePic = findViewById(R.id.btnTakePic);
+        //暂时不需要显示该按钮在眼镜上由按键触发
+        btnTakePic.setVisibility(View.GONE);
         imgPreview = findViewById(R.id.imgPreview);
+        //暂时隐藏该截图，业务上不需要显示
+        imgPreview.setVisibility(View.GONE);
         tvRedDot = findViewById(R.id.tvRedDot);
         tvTimer = findViewById(R.id.tvTimer);
         tvRedDot.setVisibility(View.GONE);
+        llVoiceMark = findViewById(R.id.llVoiceMark);
+        voiceProgress = findViewById(R.id.voiceProgress);
         btnStart.setOnClickListener(view->{
             if(mCallback!=null){
                 if (mCallback != null) {
@@ -126,5 +136,15 @@ public class MyVidoeController extends RelativeLayout {
         if(tvTimer!=null){
             tvTimer.setText(TimeUtil.formatTime(time));
         }
+    }
+
+    public void showVoiceMarker(int progress){
+        Log.d("RAMBO","voice progress = " + progress);
+        llVoiceMark.setVisibility(View.VISIBLE);
+        voiceProgress.setMax(100);
+        voiceProgress.setProgress(100-progress);
+    }
+    public void hideVoiceMarker(){
+        llVoiceMark.setVisibility(View.GONE);
     }
 }

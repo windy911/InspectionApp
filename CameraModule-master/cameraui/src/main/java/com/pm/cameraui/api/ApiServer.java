@@ -78,4 +78,5 @@ public interface ApiServer {
     @GET("mobile/inspectionRecord/selectAll")
     Observable<List<InspectRecord>> getInspectionList();
 
+
 }

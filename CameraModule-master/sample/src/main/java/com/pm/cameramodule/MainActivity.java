@@ -1,6 +1,8 @@
 package com.pm.cameramodule;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -15,6 +17,8 @@ import com.pm.cameraui.bean.AppConfig;
 import com.pm.cameraui.bean.UserInfo;
 import com.pm.cameraui.mvp.MainPresenter;
 import com.pm.cameraui.mvp.MainView;
+
+import java.sql.Time;
 
 public class MainActivity extends BaseActivity<MainPresenter> implements MainView {
 
@@ -67,6 +71,13 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainVie
         Constants.userInfo = o;
         startActivity(CameraActivity.newIntent(MainActivity.this, CameraActivity.TYPE_VIDEO));
 
-        //        startActivity(new Intent(MainActivity.this, MVPActivity.class));
     }
+
+
+
+
+
+
+
+
 }

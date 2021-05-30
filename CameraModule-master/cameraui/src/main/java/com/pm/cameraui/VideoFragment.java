@@ -1,6 +1,7 @@
 package com.pm.cameraui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
@@ -15,6 +16,7 @@ import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
 import com.hjq.toast.ToastUtils;
 import com.obs.services.model.ProgressListener;
@@ -22,22 +24,22 @@ import com.obs.services.model.ProgressStatus;
 import com.pm.cameracore.DelegateCallback;
 import com.pm.cameracore.RecordDelegate;
 import com.pm.cameraui.base.BaseFragment;
-import com.pm.cameraui.base.BasePresenter;
 import com.pm.cameraui.bean.InspectRecord;
 import com.pm.cameraui.bean.Mark;
-import com.pm.cameraui.mvp.MvpPresenter;
+import com.pm.cameraui.bean.Topic;
+import com.pm.cameraui.bean.UploadStatus;
 import com.pm.cameraui.mvp.VideoPresenter;
 import com.pm.cameraui.mvp.VideoView;
 import com.pm.cameraui.utils.FileUtils;
 import com.pm.cameraui.utils.MarkUtil;
 import com.pm.cameraui.utils.RecordUtil;
-import com.pm.cameraui.utils.StringUtils;
 import com.pm.cameraui.utils.TimeUtil;
 import com.pm.cameraui.utils.UploadUtil;
 import com.pm.cameraui.widget.AutoFitTextureView;
 import com.pm.cameraui.widget.CameraController;
 import com.pm.cameraui.widget.MyVidoeController;
 import com.pm.cameraui.widget.ShareDialog;
+import com.pm.cameraui.widget.TopicSelectDialog;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -61,9 +63,10 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     private long startTimer = System.currentTimeMillis();
     private long periodTime = 0;
     private long savePeriodTime = 0;
+    private ArrayList<Mark> markList = new ArrayList<>();
 
     private List<String> recordFileList = new ArrayList<>();
-
+    private RelativeLayout rlLoading;
 
     public static VideoFragment newInstance() {
         VideoFragment fragment = new VideoFragment();
@@ -100,8 +103,8 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         presenter.getAppConfiguration();
+
     }
 
     @Nullable
@@ -115,7 +118,6 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         super.onViewCreated(view, savedInstanceState);
 
         mRecordDelegate = new RecordDelegate(getActivity(), this);
-
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
         mController = view.findViewById(R.id.controller);
 //        mVideoViewController = view.findViewById(R.id.vv_controller);
@@ -123,16 +125,11 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         myVideoController.setControllerCallback(new CameraController.ControllerCallback() {
             @Override
             public void takePicture() {
-//                mRecordDelegate.takePicture();
                 markRecord();
             }
 
             @Override
             public void recordStart() {
-//                isLastVideoPath = false;
-//                clearSaveList();
-//                startRecording();
-
                 startNewInspectRecord();
             }
 
@@ -171,13 +168,21 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
 
             @Override
             public void onSwitchCamera() {
-                Log.d("RAMBO", "onCustomRight");
+//                Log.d("RAMBO", "onCustomRight");
                 switchCameraID();
+
+//                presenter.getInspectionTopic();
             }
         });
-
         mController.setVisibility(View.GONE);
-
+        rlLoading = view.findViewById(R.id.rlLoading);
+        rlLoading.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //截获所有点击输入
+            }
+        });
+        showLoading(false);
     }
 
 
@@ -296,14 +301,19 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     public void onCaptureResult(Bitmap bitmap) {
         if (bitmap != null) {
             Log.d("RAMBO", "拍照回调成功！ onCaptureResult: bitmap count = " + bitmap.getByteCount());
-
             String filePath = createImageFilePath(getActivity());
             String saveFile = FileUtils.saveBitmapToFile(filePath, bitmap);
             if (!TextUtils.isEmpty(saveFile)) {
                 UploadUtil.uploadImage(filePath, new UploadUtil.OnUploadsListener() {
                     @Override
                     public void onUploadSuccess(String localPath, String remoteUrl) {
-                        updateRecord(localPath, remoteUrl);
+                        if (isForVoiceMark) {
+                            audioMarkImagePath = localPath;
+                            audioMarkImageURL = remoteUrl;
+                            Log.d("RAMBO", "保存好语音MARK截图：localPath=" + localPath + " remoteUrl=" + remoteUrl);
+                        } else {
+                            updateRecord(localPath, remoteUrl);
+                        }
                     }
                 });
             }
@@ -412,6 +422,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         savePeriodTime = periodTime;
         periodTime = 0;
         refreshTimer();
+
     }
 
     private void updatePeriod() {
@@ -423,7 +434,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
 
     @Override
     public void showJsonText(String text) {
-
+        Log.d("RAMBO", "ShowJsonText:" + text);
     }
 
 
@@ -436,9 +447,6 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         inspectRecord.setStartTime(TimeUtil.getFormatDateTime(inspectRecord.getStartTimeLong()));
         if (Constants.CURRENT_TOPIC != null) {
             inspectRecord.setTopicId(Constants.CURRENT_TOPIC.getId());
-        } else {
-            //这里根据选择场景的TopicID来填入，139是硬编码“车间巡检”
-            inspectRecord.setTopicId(139l);
         }
         presenter.newInspectRecord(inspectRecord);
     }
@@ -451,6 +459,12 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         clearSaveList();
         startRecording();
         inspectRecord = record;
+        markList = new ArrayList<>();
+    }
+
+    @Override
+    public void updateInspection(InspectRecord record) {
+        MarkUtil.generateAudioForMarks(record, markList, presenter);
     }
 
     //关闭当前InspcetionTopic任务，上传数据。显示对话框。拿到了合并后的视频文件地址，还有更新录制时长。
@@ -465,6 +479,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
                 .setOnCertainButtonClickListener(new ShareDialog.OnCertainButtonClickListener() {
                     @Override
                     public void onCertainButtonClick() {
+                        showLoading(true);
                         uploadVideoFileToHuaWei(videoFilePath);
                     }
                 }).show(getFragmentManager(), "CommonDialog");
@@ -475,13 +490,14 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         UploadUtil.upload(videoFilePath, new ProgressListener() {
             @Override
             public void progressChanged(ProgressStatus progressStatus) {
-                Log.d("RAMBO progressChanged ", progressStatus.toString());
+                Log.d("RAMBO progressChanged ", "percent = "+progressStatus.getTransferPercentage());
             }
         }, new UploadUtil.OnUploadsListener() {
             @Override
             public void onUploadSuccess(String localPath, String remoteUrl) {
                 inspectRecord.setLocalVideoFilePath(localPath);
                 inspectRecord.setVideoUrl(remoteUrl);
+                inspectRecord.setUploadStatus(UploadStatus.UPLOAD_SUCCESS);
                 presenter.updateInspectRecord(inspectRecord);
             }
         });
@@ -506,27 +522,159 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         ToastUtils.show("标记成功");
         //最后提交的时候，显示Mark数 +1
         inspectRecord.setLabels(inspectRecord.getLabels() + 1);
+        markList.add(mark);
     }
 
-    //     * 1、长按，抬起 结束标记
-    //     * 2、长按超过20秒，结束标记
+
+    //截图按键 短按一下 500ms 内,拍照 Mark
+    public void onMarkShortClicked() {
+        Log.d("RAMBO", "Voice单击事件触发拍照功能！");
+        markRecord();
+        isForVoiceMark = false;
+    }
+
+    //长按开始
+    public void onMarkLongClickStart() {
+        isStartVoice = true;
+        ToastUtils.show("录音开始");
+        Log.d("RAMBO", "Voice长按开始");
+
+        audioStartTime = periodTime / 1000;
+        audioStartTimeLong = System.currentTimeMillis();
+        markRecord();
+        isForVoiceMark = true;
+
+    }
+
+    //长按结束
+    public void onMarkLongClickEnd(long voiceDuration) {
+        isStartVoice = false;
+        ToastUtils.show("录音结束");
+        Log.d("RAMBO", "Voice长按相结束,voiceDuration = " + voiceDuration);
+        myVideoController.hideVoiceMarker();
+        endVoiceMark();
+    }
+
+
+    boolean isForVoiceMark = false;
+    long audioDownTime, audioUpTime;
+    boolean isStartVoice = false;
+    boolean isStartKeyDown = false;
+
+    public void onVoiceKeyDown() {
+        if (!isEnableVoiceKey) return;
+
+        if (!mRecordDelegate.isRecording()) {
+            return;
+        }
+        if (!isStartKeyDown) {
+            isStartKeyDown = true;
+            audioDownTime = System.currentTimeMillis();
+        } else if (isStartKeyDown) {
+            //持续触发按下操作
+            if ((!isStartVoice) && (System.currentTimeMillis() - audioDownTime) > 1000) {
+                //长按1000ms以上，触发长按开始
+                onMarkLongClickStart();
+                //长按开始，则表示没有ReleaseKey，倒计时结束也不会isReleaseVoiceKey=true,除否松开按键。
+            } else if (isStartVoice) {
+                updateVoiceProgress(System.currentTimeMillis() - audioDownTime);
+            }
+        }
+    }
+
+    public void onVoiceKeyUp() {
+        //放弃长按，才算释放按键了。
+
+        if (!mRecordDelegate.isRecording()) {
+            return;
+        }
+        audioUpTime = System.currentTimeMillis();
+        if (isStartKeyDown) {
+            if ((audioUpTime - audioDownTime) < 500) {
+                //500ms内点击一次认为是单击事件
+                onMarkShortClicked();
+            } else if (audioUpTime - audioDownTime > 1000) {
+                onMarkLongClickEnd(audioUpTime - audioDownTime);
+            }
+        }
+
+
+        isEnableVoiceKey = true;
+
+    }
+
+    public static final long MAX_VOICE = 20 * 1000;//20秒最长
+
+    //显示voice录制过程的时长
+    public void updateVoiceProgress(long timer) {
+        int progress = 0;
+        if (timer > MAX_VOICE) {
+            progress = 100;
+        } else {
+            progress = (int) ((float) (timer * 100.0) / (float) MAX_VOICE);
+        }
+        myVideoController.showVoiceMarker(progress);
+        if (progress == 100) {
+            onMarkLongClickEnd(MAX_VOICE);
+        }
+    }
+
+    //* 1、长按，抬起 结束标记
+    //* 2、长按超过20秒，结束标记
     long audioStartTime;
     long audioStartTimeLong;
     long audioEndTime;
     long audioEndTimeLong;
     String audioMarkImagePath;
     String audioMarkImageURL;
+    boolean isEnableVoiceKey = true;
 
     //本地开ArrayList记录Mark，然后再分段切取的时候，读取上传更新Mark。
     //长按开启时，启动倒计时20秒Progress，同时生成图片打点记录，汇总到声音打点记录一起上报mark
     public void endVoiceMark() {
         audioEndTime = periodTime / 1000;
         audioEndTimeLong = System.currentTimeMillis();
-        Mark mark = MarkUtil.withAudioMark(inspectRecord, audioMarkImagePath, audioMarkImageURL, audioStartTime, audioEndTime, audioStartTimeLong, audioEndTimeLong);
+        Mark mark = MarkUtil.withAudioMark(inspectRecord, audioMarkImagePath, audioMarkImageURL,
+                audioStartTime, audioEndTime, audioStartTimeLong, audioEndTimeLong);
         if (mark != null) {
             presenter.addMarkRecord(mark);
         }
+        isStartKeyDown = false;
+        isStartVoice = false;
+        isEnableVoiceKey = false;
     }
 
+    @Override
+    public void showTopicList(List<Topic> o) {
+        TopicSelectDialog dialog = new TopicSelectDialog(o);
+        dialog.show(getFragmentManager(), "TopicDialog");
+    }
 
+    @Override
+    public void onApplicationResult() {
+        presenter.getInspectionTopic();
+    }
+
+    public void showLoading(boolean isShow) {
+        rlLoading.setVisibility(isShow ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public void onTaskFinish() {
+        Log.d("RAMBO","onTaskFinish()");
+//        uiHandler.sendEmptyMessage(0);
+
+
+        getActivity().finish();
+        startActivity(CameraActivity.newIntent(getActivity(), CameraActivity.TYPE_VIDEO));
+    }
+
+    private Handler uiHandler = new Handler() {
+        public void handleMessage(Message msg) {
+            if (msg.what == 0) {
+                showLoading(false);
+                presenter.getInspectionTopic();
+            }
+        }
+    };
 }

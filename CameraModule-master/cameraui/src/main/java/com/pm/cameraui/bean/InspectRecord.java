@@ -251,5 +251,34 @@ public class InspectRecord {
         this.hasUndoMarks = hasUndoMarks;
     }
 
-    
+    @Override
+    public String toString() {
+        return "InspectRecord{" +
+                "_id=" + _id +
+                ", id=" + id +
+                ", comment='" + comment + '\'' +
+                ", createBy='" + createBy + '\'' +
+                ", createDate='" + createDate + '\'' +
+                ", updateBy='" + updateBy + '\'' +
+                ", updateDate='" + updateDate + '\'' +
+                ", name='" + name + '\'' +
+                ", topicId=" + topicId +
+                ", labels=" + labels +
+                ", traceLocus='" + traceLocus + '\'' +
+                ", ownerCompnay='" + ownerCompnay + '\'' +
+                ", uploadStatus=" + uploadStatus +
+                ", recordStatus=" + recordStatus +
+                ", startTimeLong=" + startTimeLong +
+                ", startTime='" + startTime + '\'' +
+                ", endTimeLong=" + endTimeLong +
+                ", endTime='" + endTime + '\'' +
+                ", duration='" + duration + '\'' +
+                ", revision=" + revision +
+                ", updatedBy='" + updatedBy + '\'' +
+                ", updatedTime='" + updatedTime + '\'' +
+                ", localVideoFilePath='" + localVideoFilePath + '\'' +
+                ", videoUrl='" + videoUrl + '\'' +
+                ", hasUndoMarks=" + hasUndoMarks +
+                '}';
+    }
 }

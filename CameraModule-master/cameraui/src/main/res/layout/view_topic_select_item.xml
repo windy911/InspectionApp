@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="32dp"
+    android:textColor="@color/black_333333"
+    android:layout_marginTop="6dp"
+    android:layout_marginBottom="6dp"
+    android:layout_gravity="center"
+    android:id="@+id/item_topic_select_text"
+    android:textSize="14sp"
+    android:text="巡检记录"
+    android:background="@drawable/bg_round_4_ccd3f1"
+    android:gravity="center"/>

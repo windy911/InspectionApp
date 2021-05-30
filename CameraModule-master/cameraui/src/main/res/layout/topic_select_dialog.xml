@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_transparent"
+    xmlns:zhy="http://schemas.android.com/apk/res-auto"
+    android:gravity="center">
+
+    <LinearLayout
+        android:layout_width="300dp"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="10dp"
+        android:orientation="vertical"
+        android:paddingBottom="30dp"
+        android:paddingTop="30dp"
+        android:paddingStart="22dp"
+        android:paddingEnd="22dp"
+        android:background="@drawable/bg_round_20_e6ffffff"
+        android:gravity="center_horizontal">
+        <TextView
+            android:textColor="@color/black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:text="@string/select_topic"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_marginTop="16dp"
+            android:id="@+id/topic_tag_recycle_view"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_height="0dp"/>
+
+        <TextView
+            android:id="@+id/topic_tag_confirm"
+            android:text="@string/topic_select_confirm"
+            android:layout_width="match_parent"
+            android:layout_marginTop="32dp"
+            android:background="@drawable/bg_round_4_blue"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:textSize="18sp"
+            android:layout_height="40dp"/>
+    </LinearLayout>
+
+</LinearLayout>
