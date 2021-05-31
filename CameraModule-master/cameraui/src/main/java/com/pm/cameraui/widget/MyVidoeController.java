@@ -63,6 +63,7 @@ public class MyVidoeController extends RelativeLayout {
         voiceProgress = findViewById(R.id.voiceProgress);
         btnStart.setOnClickListener(view->{
             if(mCallback!=null){
+                if(!isValidClick())return;
                 if (mCallback != null) {
                     mCallback.recordStart();
                     setRecordDotShow(true);
@@ -71,6 +72,7 @@ public class MyVidoeController extends RelativeLayout {
         });
         btnStop.setOnClickListener(view->{
             if(mCallback!=null){
+                if(!isValidClick())return;
                 if (mCallback != null) {
                     mCallback.recordStop();
                     setRecordDotShow(false);
@@ -79,29 +81,44 @@ public class MyVidoeController extends RelativeLayout {
         });
         btnCameraSwitch.setOnClickListener(view->{
             if(mCallback!=null){
+                if(!isValidClick())return;
                 mCallback.onSwitchCamera();
             }
         });
         btnPause.setOnClickListener(view->{
             if(mCallback!=null){
+                if(!isValidClick())return;
                 mCallback.recordPause();
                 setRecordDotShow(false);
             }
         });
         btnContinue.setOnClickListener(view->{
             if(mCallback!=null){
+                if(!isValidClick())return;
                 mCallback.recordContinue();
                 setRecordDotShow(true);
             }
         });
         btnTakePic.setOnClickListener(view->{
             if(mCallback!=null){
+                if(!isValidClick())return;
                 mCallback.takePicture();
             }
         });
 
 
     }
+
+    private long lastActionClicked = System.currentTimeMillis();
+    public boolean isValidClick(){
+        if(System.currentTimeMillis() -  lastActionClicked > 2000){
+            lastActionClicked = System.currentTimeMillis();
+            return true;
+        }else{
+            return false;
+        }
+    }
+
 
     public void setControllerCallback(CameraController.ControllerCallback callback) {
         this.mCallback = callback;
@@ -141,8 +158,8 @@ public class MyVidoeController extends RelativeLayout {
     public void showVoiceMarker(int progress){
         Log.d("RAMBO","voice progress = " + progress);
         llVoiceMark.setVisibility(View.VISIBLE);
-        voiceProgress.setMax(100);
-        voiceProgress.setProgress(100-progress);
+        voiceProgress.setMax(100);                            
+        voiceProgress.setProgress(progress);
     }
     public void hideVoiceMarker(){
         llVoiceMark.setVisibility(View.GONE);

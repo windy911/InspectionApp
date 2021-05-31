@@ -129,7 +129,7 @@ public class RecordDelegate implements CameraDelegate {
     private Handler mBackgroundHandler;
     private CameraCaptureSession mPreviewSession;
     private MediaRecorder mMediaRecorder;
-    private boolean mIsRecordingVideo;
+    public boolean mIsRecordingVideo;
 
     public boolean isRecording(){
         return mIsRecordingVideo;
@@ -158,6 +158,7 @@ public class RecordDelegate implements CameraDelegate {
         }
         //step3 打开相机
         try {
+            Log.d("RAMBO","openCamera id = "+ mCameraId);
             mCameraManager.openCamera(mCameraId, mStateCallback, null);
         } catch (CameraAccessException e) {
             e.printStackTrace();
@@ -527,10 +528,6 @@ public class RecordDelegate implements CameraDelegate {
 
     @Override
     public void switchCameraID() {
-        if(mIsRecordingVideo){
-            Toast.makeText(mContext,"切换摄像头请先停止录像",Toast.LENGTH_SHORT).show();
-            return;
-        }
         if (mCameraId.equals("0")) {
             mCameraId = "1";
         } else if (mCameraId.equals("1")) {

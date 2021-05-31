@@ -128,7 +128,6 @@ public class UploadUtil {
 
             @Override
             public void onFailure() {
-
                 Log.e(TAG, "合并失败");
             }
 

@@ -1,5 +1,7 @@
 package com.pm.cameramodule;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -74,10 +76,15 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainVie
     }
 
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        KillApp();
+    }
 
-
-
-
-
-
+    public void KillApp(){
+        Log.d("RAMBO","KILL APP");
+        System.gc();
+        android.os.Process.killProcess(android.os.Process.myPid());
+    }
 }

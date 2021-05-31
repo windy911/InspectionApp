@@ -142,6 +142,7 @@ public class VideoPresenter extends BasePresenter<VideoView> {
                 baseView.showError(msg);
             }
         });
+
     }
 
 }
