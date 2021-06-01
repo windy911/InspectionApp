@@ -2,12 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="#000000"
-    >
+    android:background="#EE000000">
 
     <RelativeLayout
-        android:layout_width="480dp"
-        android:layout_height="320dp"
+        android:layout_width="640dp"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center_horizontal"
         android:background="#33FFFFFF" >
@@ -22,18 +21,36 @@
             android:text="@string/select_topic"/>
 
 
-        <HorizontalScrollView android:id="@+id/hscrollView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/tvTitle"
-            android:layout_above="@id/topic_tag_confirm"
-            android:layout_centerVertical="true"
-            >
-            <LinearLayout android:id="@+id/llContent"
-                android:layout_width="wrap_content"
-                android:orientation="horizontal"
-                android:layout_height="match_parent"/>
-        </HorizontalScrollView>
+        <RelativeLayout android:layout_width="match_parent"
+            android:layout_centerInParent="true"
+            android:layout_height="wrap_content">
+            <View android:id="@+id/arrowLeft"
+                android:layout_width="64dp"
+                android:layout_centerVertical="true"
+                android:background="@drawable/ic_arrow_left"
+                android:layout_height="64dp">
+            </View>
+            <HorizontalScrollView android:id="@+id/hscrollView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@id/arrowRight"
+                android:layout_toRightOf="@id/arrowLeft"
+                android:layout_centerVertical="true"
+                android:scrollbars="none">
+                <LinearLayout android:id="@+id/llContent"
+                    android:layout_width="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_height="match_parent"/>
+            </HorizontalScrollView>
+            <View android:id="@+id/arrowRight"
+                android:layout_width="64dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/ic_arrow_right"
+                android:layout_height="64dp">
+            </View>
+        </RelativeLayout>
+
 
         <TextView
             android:id="@+id/topic_tag_confirm"
@@ -42,11 +59,11 @@
             android:layout_margin ="16dp"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:background="@drawable/bg_round_4_blue"
+            android:background="@drawable/bg_login"
             android:textColor="@color/white"
             android:gravity="center"
-            android:textSize="18sp"
-            android:layout_height="40dp"/>
+            android:textSize="20sp"
+            android:layout_height="48dp"/>
     </RelativeLayout>
 
 </LinearLayout>

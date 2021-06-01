@@ -55,8 +55,8 @@ public class TopicView extends RelativeLayout {
 
     public void setSelected(boolean selected){
         tvTopic.setSelected(selected);
-        tvTopic.requestFocus();
         this.isSelected = selected;
+        tvTopic.setBackground(getContext().getDrawable(selected?R.drawable.shape_round_rect_blue:R.drawable.shape_round_rect_white));
     }
 
     public boolean isSelected(){

@@ -69,7 +69,7 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainVie
 
     @Override
     public void onLogin(UserInfo o) {
-        Toast.makeText(getApplication(), "登录成功！" + o.getUserId(), Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getApplication(), "登录成功！" + o.getUserId(), Toast.LENGTH_SHORT).show();
         Constants.userInfo = o;
         startActivity(CameraActivity.newIntent(MainActivity.this, CameraActivity.TYPE_VIDEO));
 

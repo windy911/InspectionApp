@@ -89,6 +89,7 @@ public class MarkUtil {
                                             mark.setVedioUrl(remoteUrl);
                                             Log.e("MarkUpload","markid="+mark.getId()+"文件上传成功");
                                             mark.setVedioLocalPath(outFile.getAbsolutePath());
+                                            mark.setMarkType(1);
 //                                            DaoManager.getInstance().getSession().getMarkDao().update(mark);
 //                                            inspectVM.updateMarkRecord(mark);
                                             delUploadCount();

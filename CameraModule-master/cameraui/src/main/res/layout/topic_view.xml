@@ -11,8 +11,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         tools:text="台风车间"
-        android:textSize="30sp"
-        android:padding="10dp"
+        android:textSize="24sp"
+        android:padding="16dp"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
         android:background="@drawable/selector_topic_bg_drak"
         android:textColor="@color/selector_topic_text" />
 

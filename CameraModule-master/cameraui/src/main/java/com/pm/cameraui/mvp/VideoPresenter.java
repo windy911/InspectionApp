@@ -122,7 +122,6 @@ public class VideoPresenter extends BasePresenter<VideoView> {
 
     public void updateMarkRecord(Mark mark){
 
-
         if(baseView!=null&&mark==null){
             baseView.onTaskFinish();
             return;
@@ -131,7 +130,6 @@ public class VideoPresenter extends BasePresenter<VideoView> {
         addDisposable(apiServer.updateMarkRecord(mark), new BaseObserver<Mark>(baseView) {
             @Override
             public void onSuccess(Mark o) {
-//              baseView.addMarkRecord(o);
                 Log.d("RAMBO","updateMarkRecord Success :" +mark.toString());
                 if(MarkUtil.isFinishUpload()){
                     baseView.onTaskFinish();

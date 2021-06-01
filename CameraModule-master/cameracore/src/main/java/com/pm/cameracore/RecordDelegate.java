@@ -190,7 +190,7 @@ public class RecordDelegate implements CameraDelegate {
                 mSensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
                 Size[] outputSizes = map.getOutputSizes(MediaRecorder.class);
                 mVideoSize = SizeUtils.chooseOutputSize(outputSizes, new Size(1280, 720), new Size(16, 9), false);
-                mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class), width, height, mVideoSize);
+                 mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class), width, height, mVideoSize);
                 if (DEBUG) {
                     for (Size size : outputSizes) {
                         Log.d(TAG, "openCamera: size=" + size);
@@ -269,7 +269,9 @@ public class RecordDelegate implements CameraDelegate {
         if (null == mPreviewSize || null == mContext) {
             return;
         }
+
         int rotation = mWindowManager.getDefaultDisplay().getRotation();
+
         Matrix matrix = new Matrix();
         RectF viewRect = new RectF(0, 0, viewWidth, viewHeight);
         RectF bufferRect = new RectF(0, 0, mPreviewSize.getHeight(), mPreviewSize.getWidth());
@@ -465,7 +467,7 @@ public class RecordDelegate implements CameraDelegate {
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
         mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
 
-        int rotation = mWindowManager.getDefaultDisplay().getRotation();
+        int rotation = 1;//mWindowManager.getDefaultDisplay().getRotation();
         switch (mSensorOrientation) {
             case SENSOR_ORIENTATION_DEFAULT_DEGREES:
                 mMediaRecorder.setOrientationHint(DEFAULT_ORIENTATIONS.get(rotation));

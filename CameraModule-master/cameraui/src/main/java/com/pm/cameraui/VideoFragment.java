@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.hjq.toast.ToastUtils;
@@ -68,6 +69,8 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
 
     private List<String> recordFileList = new ArrayList<>();
     private RelativeLayout rlLoading;
+    private TextView tvProgress;
+    private String strProgress;
     private boolean isGotTopic = false;
 
 
@@ -187,6 +190,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         });
         mController.setVisibility(View.GONE);
         rlLoading = view.findViewById(R.id.rlLoading);
+        tvProgress = view.findViewById(R.id.tvProgress);
         rlLoading.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -516,6 +520,10 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
             @Override
             public void progressChanged(ProgressStatus progressStatus) {
                 Log.d("RAMBO progressChanged ", "percent = "+progressStatus.getTransferPercentage());
+                strProgress = ""+progressStatus.getTransferPercentage();
+                Message message = new Message();
+                message.what=1;
+                uiHandler.sendMessage(message);
             }
         }, new UploadUtil.OnUploadsListener() {
             @Override
@@ -683,16 +691,9 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
 
     @Override
     public void onTaskFinish() {
-//        Log.d("RAMBO","onTaskFinish()");
-//        getActivity().finish();
-//        startActivity(CameraActivity.newIntent(getActivity(), CameraActivity.TYPE_VIDEO));
-
-//      presenter.getInspectionTopic();
-
         Message message = new Message();
         message.what = 0;
         uiHandler.sendMessage(message);
-
     }
 
     private Handler uiHandler = new Handler() {
@@ -700,9 +701,10 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
             if (msg.what == 0) {
                 showLoading(false);
                 CameraActivity.instance.hideNavigation();
+            }else if(msg.what == 1){
+                tvProgress.setText(strProgress);
             }
         }
     };
-
 
 }
