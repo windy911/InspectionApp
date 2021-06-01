@@ -1,37 +1,34 @@
 package com.pm.cameraui.widget;
 
-import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.pm.cameraui.CameraActivity;
 import com.pm.cameraui.Constants;
 import com.pm.cameraui.R;
-import com.pm.cameraui.adapter.TopicAdapter;
 import com.pm.cameraui.bean.Topic;
-import com.zhy.view.flowlayout.TagFlowLayout;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-public class TopicSelectDialog extends DialogFragment implements View.OnClickListener, TopicAdapter.onTopicItemClickListener {
-    private TagFlowLayout tagFlowLayout;
-    private RecyclerView tagRecycleView;
+public class TopicSelectDialog extends DialogFragment implements View.OnClickListener  {
+
     private TextView confirmButton;
     private Topic selectTopic;
     private List<Topic> topicList;
-    private TopicAdapter mTopicAdapter;
+    private LinearLayout llContent;
+    private ArrayList<TopicView> topicViews;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -49,40 +46,58 @@ public class TopicSelectDialog extends DialogFragment implements View.OnClickLis
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View mView = inflater.inflate(R.layout.topic_select_dialog, container, false);
-
-        tagRecycleView = mView.findViewById(R.id.topic_tag_recycle_view);
         confirmButton = mView.findViewById(R.id.topic_tag_confirm);
-
-        tagRecycleView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mTopicAdapter = new TopicAdapter(getActivity(),topicList);
-        tagRecycleView.setAdapter(mTopicAdapter);
         confirmButton.setOnClickListener(this);
-        mTopicAdapter.setOnTopicItemClickListener(this);
+        llContent = mView.findViewById(R.id.llContent);
+        topicViews = new ArrayList<>();
+
+        for(int i = 0;i<topicList.size();i++){
+            TopicView topicView = new TopicView(getActivity());
+            topicView.setContent(topicList.get(i));
+            //设置index为Tag
+            topicView.setTag(i);
+            topicView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int index = (int)v.getTag();
+                    selectTopic = topicList.get(index);
+                    Log.d("RAMBO","选中了 " + selectTopic.getName());
+                    selectedIndex(index);
+                }
+            });
+            llContent.addView(topicView);
+            topicViews.add(topicView);
+        }
+
         if (topicList != null && topicList.size() > 0){
-            selectTopic = topicList.get(0);
+            selectedIndex(0);
         }
         return mView;
     }
 
     @Override
     public void onClick(View view) {
-        if (selectTopic == null){
-            Toast.makeText(getActivity(), getString(R.string.select_topic), Toast.LENGTH_SHORT).show();
-            return;
-        }
-        Constants.CURRENT_TOPIC = selectTopic;
-        dismiss();
+       if(view.getId() == R.id.topic_tag_confirm){
+           if (selectTopic == null){
+               Toast.makeText(getActivity(), getString(R.string.select_topic), Toast.LENGTH_SHORT).show();
+               return;
+           }
+           Constants.CURRENT_TOPIC = selectTopic;
+           dismiss();
+       }
     }
 
-    @Override
-    public void onTopicClick(Topic topic) {
-        selectTopic = topic;
+    public void selectedIndex(int index){
+        selectTopic = topicList.get(index);
+        for(int i =0;i<topicViews.size();i++){
+            topicViews.get(i).setSelected(index==i);
+        }
     }
+
 
     @Override
     public void onResume() {
         super.onResume();
-
     }
 
     @Override

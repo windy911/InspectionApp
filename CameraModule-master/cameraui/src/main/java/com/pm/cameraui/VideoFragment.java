@@ -70,7 +70,6 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     private RelativeLayout rlLoading;
     private boolean isGotTopic = false;
 
-    private long lastActionClicked = System.currentTimeMillis();
 
     public static VideoFragment newInstance() {
         VideoFragment fragment = new VideoFragment();
@@ -667,8 +666,8 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     }
 
     @Override
-    public void showTopicList(List<Topic> o) {
-        TopicSelectDialog dialog = new TopicSelectDialog(o);
+    public void showTopicList(List<Topic> topics) {
+        TopicSelectDialog dialog = new TopicSelectDialog(topics);
         dialog.show(getFragmentManager(), "TopicDialog");
         isGotTopic = true;
     }
