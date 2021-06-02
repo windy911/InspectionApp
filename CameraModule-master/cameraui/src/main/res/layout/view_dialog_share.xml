@@ -6,6 +6,8 @@
     android:layout_height="wrap_content"
     android:padding="24dp"
     android:background="@drawable/shape_round_rect_comm">
+
+
     <TextView
         android:id="@+id/item_inspect_dialog_title"
         android:layout_width="280dp"
@@ -93,8 +95,6 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="40dp"
@@ -131,4 +131,5 @@
             android:textSize="16sp"/>
 
     </LinearLayout>
+
 </LinearLayout>

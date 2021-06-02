@@ -1,8 +1,10 @@
 package com.pm.cameramodule;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -19,6 +21,7 @@ import com.pm.cameraui.bean.AppConfig;
 import com.pm.cameraui.bean.UserInfo;
 import com.pm.cameraui.mvp.MainPresenter;
 import com.pm.cameraui.mvp.MainView;
+import com.pm.cameraui.utils.SPHelp;
 
 import java.sql.Time;
 
@@ -60,6 +63,13 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainVie
                 login();
             }
         });
+
+        String userName = SPHelp.getInstance(getActivity()).getStringValue(SPHelp.SP_LOGIN_NAME);
+        String password = SPHelp.getInstance(getActivity()).getStringValue(SPHelp.SP_LOGIN_PASSWORD);
+        if((!TextUtils.isEmpty(userName))&&(!TextUtils.isEmpty(password))){
+            edtLoginName.setText(userName);
+            edtLoginPswd.setText(password);
+        }
     }
 
     public void login() {
@@ -72,7 +82,6 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainVie
 //        Toast.makeText(getApplication(), "登录成功！" + o.getUserId(), Toast.LENGTH_SHORT).show();
         Constants.userInfo = o;
         startActivity(CameraActivity.newIntent(MainActivity.this, CameraActivity.TYPE_VIDEO));
-
     }
 
 
@@ -86,5 +95,10 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainVie
         Log.d("RAMBO","KILL APP");
         System.gc();
         android.os.Process.killProcess(android.os.Process.myPid());
+    }
+
+    @Override
+    public Activity getActivity() {
+        return this;
     }
 }
