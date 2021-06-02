@@ -203,6 +203,11 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
 
 
     public void switchCameraID() {
+
+        long time = System.currentTimeMillis();
+        Log.d("RAMBO TIME:",time+" "+TimeUtil.getFormatDateTime(time));
+
+
         mRecordDelegate.switchCameraID();
         mRecordDelegate.closeCamera();
         onPrepareCamera(mTextureView.getWidth(), mTextureView.getHeight());
@@ -483,7 +488,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         inspectRecord = record;
         markList = new ArrayList<>();
         LocationUtil.clearAll();
-        CameraActivity.instance.location();
+//        CameraActivity.instance.location();
     }
 
     @Override
@@ -496,7 +501,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         //用savePeriodTime来记录最后清零前的计时器数据
         inspectRecord = RecordUtil.endRecord(inspectRecord, savePeriodTime);
         new ShareDialog(inspectRecord)
-                .setTitle("完成巡检记录")
+                .setTitle(inspectRecord.getName())
                 .setConfirm("立即上传")
                 .setCancel("稍后上传")
                 .setDialogCancelable(false)

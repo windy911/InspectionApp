@@ -3,10 +3,11 @@ package com.pm.cameraui.utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 public class TimeUtil {
     private static String recordString  = "%1$s:%2$s:%3$s";
-    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:MM:ss");
+    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static SimpleDateFormat dateFormatDate = new SimpleDateFormat("yyyy-MM-dd");
     private static SimpleDateFormat dateFormatDateTime = new SimpleDateFormat("yyyy-MM-dd HH:MM");
     /**

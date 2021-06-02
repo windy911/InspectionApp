@@ -56,7 +56,6 @@ public class CameraActivity extends AppCompatActivity {
                     .replace(R.id.container, cameraType.equals(TYPE_PICTURE) ? PictureFragment.newInstance() : fragment)
                     .commit();
         }
-//        requestLocationPermission();
     }
 
     @Override
