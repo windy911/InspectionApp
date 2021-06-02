@@ -1,17 +1,31 @@
 package com.pm.cameraui;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.amap.api.location.AMapLocation;
+import com.amap.api.location.AMapLocationClient;
+import com.amap.api.location.AMapLocationListener;
+import com.pm.cameraui.bean.InsLocation;
+import com.pm.cameraui.utils.LocationUtil;
+
+import java.util.ArrayList;
+import java.util.Objects;
+
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 
@@ -42,6 +56,7 @@ public class CameraActivity extends AppCompatActivity {
                     .replace(R.id.container, cameraType.equals(TYPE_PICTURE) ? PictureFragment.newInstance() : fragment)
                     .commit();
         }
+//        requestLocationPermission();
     }
 
     @Override
@@ -129,5 +144,53 @@ public class CameraActivity extends AppCompatActivity {
         }
         return super.onKeyUp(keyCode, event);
     }
+
+
+
+    //声明AMapLocationClient类对象
+    public AMapLocationClient mLocationClient = null;
+    private static final int REQUEST_CAMERA_PERMISSION = 0;
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public void location(){
+        if(mLocationClient==null){
+            //初始化定位
+            mLocationClient = new AMapLocationClient(getApplicationContext());
+            //设置定位回调监听
+            mLocationClient.setLocationListener(mAMapLocationListener);
+            //启动定位
+            mLocationClient.startLocation();
+            //异步获取定位结果
+        }
+    }
+
+    AMapLocationListener mAMapLocationListener = new AMapLocationListener(){
+        @Override
+        public void onLocationChanged(AMapLocation amapLocation) {
+            Log.d("RAMBO","onLocationChanged " + amapLocation.toStr());
+            if (amapLocation != null) {
+                if (amapLocation.getErrorCode() == 0) {
+                    //解析定位结果
+                    LocationUtil.locationList.add(new InsLocation(amapLocation.getLatitude()+"",amapLocation.getLongitude()+"","",System.currentTimeMillis()));
+                    //可在其中解析amapLocation获取相应内容。
+                    Log.e("RAMBO","location Success 经度:"
+                            + amapLocation.getLatitude() + ", 维度:"
+                            + amapLocation.getLongitude());
+                }
+            }
+        }
+    };
+
+    public void requestLocationPermission(){
+        ArrayList<String> permission = new ArrayList<String>(3);
+        if (ContextCompat.checkSelfPermission(Objects.requireNonNull(getApplication()), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            permission.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+        if (!permission.isEmpty()) {
+            requestPermissions((String[]) permission.toArray(new String[permission.size()]), REQUEST_CAMERA_PERMISSION);
+            return;
+        }
+    }
+
 
 }

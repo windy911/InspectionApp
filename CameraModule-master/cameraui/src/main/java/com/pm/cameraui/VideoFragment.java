@@ -33,6 +33,7 @@ import com.pm.cameraui.bean.UploadStatus;
 import com.pm.cameraui.mvp.VideoPresenter;
 import com.pm.cameraui.mvp.VideoView;
 import com.pm.cameraui.utils.FileUtils;
+import com.pm.cameraui.utils.LocationUtil;
 import com.pm.cameraui.utils.MarkUtil;
 import com.pm.cameraui.utils.RecordUtil;
 import com.pm.cameraui.utils.TimeUtil;
@@ -180,7 +181,6 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
 
             @Override
             public void onSwitchCamera() {
-
                 if(mRecordDelegate.mIsRecordingVideo){
                     Toast.makeText(getActivity(),"切换摄像头请先停止录像",Toast.LENGTH_SHORT).show();
                     return;
@@ -482,6 +482,8 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         startRecording();
         inspectRecord = record;
         markList = new ArrayList<>();
+        LocationUtil.clearAll();
+        CameraActivity.instance.location();
     }
 
     @Override

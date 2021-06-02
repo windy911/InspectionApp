@@ -58,11 +58,12 @@ public abstract class BaseCameraFragment extends Fragment implements TextureView
      * 打开相机前的准备，权限的检查
      */
     protected void onPrepareCamera(int width, int height) {
-        ArrayList<String> permission = new ArrayList<String>(3);
+        ArrayList<String> permission = new ArrayList<String>(4);
         if (ContextCompat.checkSelfPermission(Objects.requireNonNull(getActivity()), Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
             permission.add(Manifest.permission.CAMERA);
         }
+
         if (mIsRecord && ContextCompat.checkSelfPermission(Objects.requireNonNull(getActivity()), Manifest.permission.RECORD_AUDIO)
                 != PackageManager.PERMISSION_GRANTED) {
             permission.add(Manifest.permission.RECORD_AUDIO);
@@ -71,11 +72,17 @@ public abstract class BaseCameraFragment extends Fragment implements TextureView
                 != PackageManager.PERMISSION_GRANTED) {
             permission.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
+        if (ContextCompat.checkSelfPermission(Objects.requireNonNull(getActivity()), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            permission.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
 
         if (!permission.isEmpty()) {
             requestCameraPermission((String[]) permission.toArray(new String[permission.size()]));
             return;
         }
+
+
         openCamera(width, height);
     }
 
