@@ -15,6 +15,7 @@ import android.view.WindowManager;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
+import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
 import com.pm.cameraui.bean.InsLocation;
 import com.pm.cameraui.utils.LocationUtil;
@@ -148,8 +149,8 @@ public class CameraActivity extends AppCompatActivity {
 
     //声明AMapLocationClient类对象
     public AMapLocationClient mLocationClient = null;
-    private static final int REQUEST_CAMERA_PERMISSION = 0;
-    @RequiresApi(api = Build.VERSION_CODES.M)
+
+
     public void location(){
         if(mLocationClient==null){
             //初始化定位
@@ -157,10 +158,14 @@ public class CameraActivity extends AppCompatActivity {
             //设置定位回调监听
             mLocationClient.setLocationListener(mAMapLocationListener);
             //启动定位
+            AMapLocationClientOption option = new AMapLocationClientOption();
+            option.setInterval(5000);
+            mLocationClient.setLocationOption(option);
             mLocationClient.startLocation();
             //异步获取定位结果
         }
     }
+
 
     AMapLocationListener mAMapLocationListener = new AMapLocationListener(){
         @Override
@@ -169,27 +174,21 @@ public class CameraActivity extends AppCompatActivity {
             if (amapLocation != null) {
                 if (amapLocation.getErrorCode() == 0) {
                     //解析定位结果
-                    LocationUtil.locationList.add(new InsLocation(amapLocation.getLatitude()+"",amapLocation.getLongitude()+"","",System.currentTimeMillis()));
-                    //可在其中解析amapLocation获取相应内容。
-                    Log.e("RAMBO","location Success 经度:"
-                            + amapLocation.getLatitude() + ", 维度:"
-                            + amapLocation.getLongitude());
+                    if(LocationUtil.isEnableRecording()){
+                        LocationUtil.locationList.add(new InsLocation(amapLocation.getLatitude()+"",amapLocation.getLongitude()+"","",System.currentTimeMillis()));
+                        //可在其中解析amapLocation获取相应内容。
+                        Log.e("RAMBO","size = " + LocationUtil.locationList.size()+" 经度:"+ amapLocation.getLatitude() + ", 维度:"+ amapLocation.getLongitude());
+                    }
                 }
             }
         }
     };
 
-    public void requestLocationPermission(){
-        ArrayList<String> permission = new ArrayList<String>(3);
-        if (ContextCompat.checkSelfPermission(Objects.requireNonNull(getApplication()), Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            permission.add(Manifest.permission.ACCESS_FINE_LOCATION);
-        }
-        if (!permission.isEmpty()) {
-            requestPermissions((String[]) permission.toArray(new String[permission.size()]), REQUEST_CAMERA_PERMISSION);
-            return;
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(mLocationClient!=null){
+            mLocationClient.onDestroy();
         }
     }
-
-
 }

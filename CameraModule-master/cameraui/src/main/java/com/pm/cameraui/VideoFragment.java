@@ -203,11 +203,6 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
 
 
     public void switchCameraID() {
-
-        long time = System.currentTimeMillis();
-        Log.d("RAMBO TIME:",time+" "+TimeUtil.getFormatDateTime(time));
-
-
         mRecordDelegate.switchCameraID();
         mRecordDelegate.closeCamera();
         onPrepareCamera(mTextureView.getWidth(), mTextureView.getHeight());
@@ -453,6 +448,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     }
 
     private void updatePeriod() {
+        LocationUtil.setEnableLocation(mRecordDelegate.isRecording());
         if (mRecordDelegate.isRecording()) {
             periodTime += System.currentTimeMillis() - startTimer;
             startTimer = System.currentTimeMillis();
@@ -463,7 +459,6 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     public void showJsonText(String text) {
         Log.d("RAMBO", "ShowJsonText:" + text);
     }
-
 
     InspectRecord inspectRecord;
 
@@ -487,8 +482,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         startRecording();
         inspectRecord = record;
         markList = new ArrayList<>();
-        LocationUtil.clearAll();
-//        CameraActivity.instance.location();
+        CameraActivity.instance.location();
     }
 
     @Override
@@ -538,6 +532,8 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
                 inspectRecord.setLocalVideoFilePath(localPath);
                 inspectRecord.setVideoUrl(remoteUrl);
                 inspectRecord.setUploadStatus(UploadStatus.UPLOAD_SUCCESS);
+                inspectRecord.setTraceLocus(LocationUtil.getLocationString());
+                LocationUtil.clearAll();
                 presenter.updateInspectRecord(inspectRecord);
             }
         });
