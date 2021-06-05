@@ -58,6 +58,14 @@
             android:layout_marginLeft="16dp"
             android:background="@drawable/ic_take_photo" />
 
+        <Button
+            android:id="@+id/btnSwitchCamera2"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginLeft="16dp"
+            android:visibility="visible"
+            android:background="@drawable/icon_camera_switch" />
+
     </LinearLayout>
 
 
@@ -70,10 +78,15 @@
         android:layout_marginBottom="48dp"
         android:background="@drawable/icon_camera_switch" />
 
-    <ImageView android:id="@+id/imgPreview"
-        android:layout_width="160dp"
-        android:layout_margin="16dp"
-        android:layout_height="90dp"/>
+    <Button
+        android:id="@+id/btnExitApp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="48dp"
+        android:layout_marginBottom="48dp"
+        android:background="@drawable/ic_baseline_exit_to_app_24" />
+
+
 
     <LinearLayout android:layout_width="wrap_content"
         android:layout_height="20sp"

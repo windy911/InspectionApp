@@ -382,5 +382,7 @@ public class CameraController extends FrameLayout {
         void onClose();
 
         void onSwitchCamera();
+
+        void onExitApp();
     }
 }

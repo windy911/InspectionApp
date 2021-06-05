@@ -113,7 +113,6 @@ public class UploadUtil {
         }
 
         EpEditor.mergeByLc(context, epVideos, new EpEditor.OutputOption(outFile), new OnEditorListener() {
-
             @Override
             public void onSuccess() {
                 Log.e(TAG, "合并成功 输出路径：" + outFile);

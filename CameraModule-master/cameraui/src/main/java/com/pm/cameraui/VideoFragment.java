@@ -1,7 +1,6 @@
 package com.pm.cameraui;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
@@ -18,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.hjq.toast.ToastUtils;
 import com.obs.services.model.ProgressListener;
@@ -72,7 +70,8 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     private RelativeLayout rlLoading;
     private TextView tvProgress;
     private String strProgress;
-    private boolean isGotTopic = false;
+
+    private boolean isFinishedTask = false;
 
 
     public static VideoFragment newInstance() {
@@ -136,17 +135,15 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
 
             @Override
             public void recordStart() {
-
-                if(isGotTopic){
+                if (Constants.CURRENT_TOPIC != null) {
                     startNewInspectRecord();
-                }else {
+                } else {
                     presenter.getInspectionTopic();
                 }
             }
 
             @Override
             public void recordStop() {
-
                 isLastVideoPath = true;
                 //真正退出，不及时预览
                 stopRecording();
@@ -154,7 +151,6 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
 
             @Override
             public void recordPause() {
-
                 //真正退出，不及时预览
                 pauseRecording();
             }
@@ -181,11 +177,20 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
 
             @Override
             public void onSwitchCamera() {
-                if(mRecordDelegate.mIsRecordingVideo){
-                    Toast.makeText(getActivity(),"切换摄像头请先停止录像",Toast.LENGTH_SHORT).show();
-                    return;
+                if (mRecordDelegate.mIsRecordingVideo) {//如果正在录制，直接执行 暂停+切换+继续的操作
+                    //Toast.makeText(getActivity(),"切换摄像头请先停止录像",Toast.LENGTH_SHORT).show();
+                    pauseRecording();
+                    startTaskForSwitchCamera();
+                } else {
+                    //如果不在录制，则直接切换摄像头
+                    switchCameraID();
                 }
-                switchCameraID();
+
+            }
+
+            @Override
+            public void onExitApp() {
+                CameraActivity.instance.onBackPressed();
             }
         });
         mController.setVisibility(View.GONE);
@@ -200,6 +205,25 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         showLoading(false);
     }
 
+    public void startTaskForSwitchCamera() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    //先切换镜头
+                    Message msg = new Message();
+                    msg.what = HANDLER_SWITCH_CAMERA;
+                    uiHandler.sendMessageDelayed(msg, 1000);
+                    Thread.sleep(2000);
+                    Message msg2 = new Message();
+                    msg2.what = HANDLER_CONTINUE_RECORD;
+                    uiHandler.sendMessage(msg2);
+                } catch (Exception e) {
+
+                }
+            }
+        }).start();
+    }
 
 
     public void switchCameraID() {
@@ -234,6 +258,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         myVideoController.refreshUIRecord(true);
         mRecordDelegate.startBackgroundThread();
         refreshTimer();
+        isFinishedTask = false;
     }
 
     public void stopRecording() {
@@ -425,13 +450,13 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     @Override
     public void onStop() {
         super.onStop();
-        try{
+        try {
             if (timer != null) {
                 timer.cancel();
             }
             mRecordDelegate.stopBackgroundThread();
             mRecordDelegate.closeCamera();
-        }catch (Exception e){
+        } catch (Exception e) {
 
         }
     }
@@ -506,24 +531,17 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
                         uploadVideoFileToHuaWei(videoFilePath);
                     }
                 }).show(getFragmentManager(), "CommonDialog");
-        //需要重新获取Topic开启新任务
-        isGotTopic = false;
     }
 
-    public void resetCamera(){
-        if(mRecordDelegate.mCameraId.equals(mRecordDelegate.CAMERA_ID_1)){
-            mRecordDelegate.switchCameraID();
-        }
-    }
 
     public void uploadVideoFileToHuaWei(String videoFilePath) {
         UploadUtil.upload(videoFilePath, new ProgressListener() {
             @Override
             public void progressChanged(ProgressStatus progressStatus) {
-                Log.d("RAMBO progressChanged ", "percent = "+progressStatus.getTransferPercentage());
-                strProgress = ""+progressStatus.getTransferPercentage();
+                Log.d("RAMBO progressChanged ", "percent = " + progressStatus.getTransferPercentage());
+                strProgress = "" + progressStatus.getTransferPercentage() + "%";
                 Message message = new Message();
-                message.what=1;
+                message.what = HANDLER_UPDATE_PROGRESS;
                 uiHandler.sendMessage(message);
             }
         }, new UploadUtil.OnUploadsListener() {
@@ -572,7 +590,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     //长按开始
     public void onMarkLongClickStart() {
         isStartVoice = true;
-        ToastUtils.show("录音开始");
+//        ToastUtils.show("录音开始");
         Log.d("RAMBO", "Voice长按开始");
         audioStartTime = periodTime / 1000;
         audioStartTimeLong = System.currentTimeMillis();
@@ -584,7 +602,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     //长按结束
     public void onMarkLongClickEnd(long voiceDuration) {
         isStartVoice = false;
-        ToastUtils.show("录音结束");
+//        ToastUtils.show("录音结束");
         Log.d("RAMBO", "Voice长按相结束,voiceDuration = " + voiceDuration);
         myVideoController.hideVoiceMarker();
         endVoiceMark();
@@ -680,7 +698,6 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     public void showTopicList(List<Topic> topics) {
         TopicSelectDialog dialog = new TopicSelectDialog(topics);
         dialog.show(getFragmentManager(), "TopicDialog");
-        isGotTopic = true;
     }
 
     @Override
@@ -694,20 +711,35 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
 
     @Override
     public void onTaskFinish() {
-        Message message = new Message();
-        message.what = 0;
-        uiHandler.sendMessage(message);
+        //不弹出多个场景选择器
+        if(!isFinishedTask){
+            isFinishedTask = true;
+            Message message = new Message();
+            message.what = HANDLER_FINISHED_TASK;
+            uiHandler.sendMessage(message);
+        }
     }
 
+
+    public static final int HANDLER_FINISHED_TASK = 0;
+    public static final int HANDLER_UPDATE_PROGRESS = 1;
+    public static final int HANDLER_SWITCH_CAMERA = 2;
+    public static final int HANDLER_CONTINUE_RECORD = 3;
     private Handler uiHandler = new Handler() {
         public void handleMessage(Message msg) {
-            if (msg.what == 0) {
+            if (msg.what == HANDLER_FINISHED_TASK) {
                 showLoading(false);
                 CameraActivity.instance.hideNavigation();
-            }else if(msg.what == 1){
+                presenter.getInspectionTopic();
+            } else if (msg.what == HANDLER_UPDATE_PROGRESS) {
                 tvProgress.setText(strProgress);
+            } else if (msg.what == HANDLER_SWITCH_CAMERA) {
+                switchCameraID();
+            } else if (msg.what == HANDLER_CONTINUE_RECORD) {
+                continueRecording();
             }
         }
     };
+
 
 }

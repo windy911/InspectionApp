@@ -127,6 +127,11 @@ public class PictureFragment extends BaseCameraFragment implements DelegateCallb
             public void onSwitchCamera() {
 
             }
+
+            @Override
+            public void onExitApp() {
+
+            }
         });
     }
 
