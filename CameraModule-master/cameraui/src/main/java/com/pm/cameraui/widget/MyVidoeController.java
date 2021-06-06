@@ -17,7 +17,7 @@ import com.pm.cameraui.utils.TimeUtil;
 public class MyVidoeController extends RelativeLayout {
 
     CameraController.ControllerCallback mCallback;
-    Button btnStart, btnSwitchCamera, btnSwitchCamera2, btnStop, btnContinue, btnPause, btnTakePic, btnExitApp;
+    Button btnStart, btnSwitchCamera, btnSwitchCamera2, btnStop, btnContinue, btnPause, btnExitApp;
     LinearLayout llRecording;
     TextView tvRedDot, tvTimer;
     ProgressBar voiceProgress;
@@ -48,9 +48,8 @@ public class MyVidoeController extends RelativeLayout {
         llRecording = findViewById(R.id.llRecording);
         btnSwitchCamera = findViewById(R.id.btnSwitchCamera);
         btnSwitchCamera2 = findViewById(R.id.btnSwitchCamera2);
-        btnTakePic = findViewById(R.id.btnTakePic);
         //暂时不需要显示该按钮在眼镜上由按键触发
-        btnTakePic.setVisibility(View.GONE);
+//        btnTakePic.setVisibility(View.GONE);
         //暂时隐藏该截图，业务上不需要显示
 //        imgPreview.setVisibility(View.GONE);
         tvRedDot = findViewById(R.id.tvRedDot);
@@ -103,18 +102,14 @@ public class MyVidoeController extends RelativeLayout {
                 setRecordDotShow(true);
             }
         });
-        btnTakePic.setOnClickListener(view -> {
-            if (mCallback != null) {
-                if (!isValidClick()) return;
-                mCallback.takePicture();
-            }
-        });
+
         btnExitApp.setOnClickListener(view -> {
             if (mCallback != null) {
                 mCallback.onExitApp();
             }
         });
 
+        btnStart.requestFocus();
     }
 
     private long lastActionClicked = System.currentTimeMillis();
@@ -146,6 +141,7 @@ public class MyVidoeController extends RelativeLayout {
     public void pauseRecording() {
         btnPause.setVisibility(View.GONE);
         btnContinue.setVisibility(View.VISIBLE);
+        btnContinue.requestFocus();
     }
 
     public void continueRecording() {
@@ -175,4 +171,94 @@ public class MyVidoeController extends RelativeLayout {
     public void hideVoiceMarker() {
         llVoiceMark.setVisibility(View.GONE);
     }
+
+
+    public void onClicked() {
+        if (btnStart.isFocused()) {
+            btnStart.performClick();
+        } else if (btnSwitchCamera.isFocused()) {
+            btnSwitchCamera.performClick();
+        } else if (btnSwitchCamera2.isFocused()) {
+            btnSwitchCamera2.performClick();
+        } else if (btnExitApp.isFocused()) {
+            btnExitApp.performClick();
+        } else if (btnPause.isFocused()) {
+            btnPause.performClick();
+        } else if (btnContinue.isFocused()) {
+            btnContinue.performClick();
+        } else if (btnStop.isFocused()) {
+            btnStop.performClick();
+        }
+    }
+
+    public void slideFocusChange(int DIR) {
+        Log.d("RAMBO", "MyVideoController SlideChange = " + DIR);
+        if (btnStart.isFocused()) {
+            if (DIR == TouchHandlerListener.DIR_UP || DIR == TouchHandlerListener.DIR_LEFT) {
+                btnExitApp.requestFocus();
+            } else if (DIR == TouchHandlerListener.DIR_RIGHT) {
+                btnSwitchCamera.requestFocus();
+            }
+        } else if (btnExitApp.isFocused()) {
+            if (DIR == TouchHandlerListener.DIR_RIGHT) {
+                if (btnSwitchCamera.getVisibility() == View.VISIBLE) {
+                    btnSwitchCamera.requestFocus();
+                } else {
+                    if (btnPause.getVisibility() == View.VISIBLE) {
+                        btnPause.requestFocus();
+                    } else if (btnContinue.getVisibility() == View.VISIBLE) {
+                        btnContinue.requestFocus();
+                    }
+                }
+            } else if (DIR == TouchHandlerListener.DIR_DOWN) {
+                if (btnStart.getVisibility() == VISIBLE) {
+                    btnStart.requestFocus();
+                } else {
+                    if (btnContinue.getVisibility() == View.VISIBLE) {
+                        btnContinue.requestFocus();
+                    } else if (btnPause.getVisibility() == View.VISIBLE) {
+                        btnPause.requestFocus();
+                    }
+                }
+            }
+        } else if (btnSwitchCamera.isFocused()) {
+            if (DIR == TouchHandlerListener.DIR_LEFT) {
+                btnExitApp.requestFocus();
+            } else if (DIR == TouchHandlerListener.DIR_DOWN) {
+                btnStart.requestFocus();
+            }
+        } else if (btnPause.isFocused()) {
+            if (DIR == TouchHandlerListener.DIR_LEFT || DIR == TouchHandlerListener.DIR_UP) {
+                btnExitApp.requestFocus();
+            } else if (DIR == TouchHandlerListener.DIR_RIGHT) {
+                btnStop.requestFocus();
+            }
+        } else if (btnContinue.isFocused()) {
+            if (DIR == TouchHandlerListener.DIR_LEFT || DIR == TouchHandlerListener.DIR_UP) {
+                btnExitApp.requestFocus();
+            } else if (DIR == TouchHandlerListener.DIR_RIGHT) {
+                btnStop.requestFocus();
+            }
+        } else if (btnStop.isFocused()) {
+            if (DIR == TouchHandlerListener.DIR_LEFT) {
+                if (btnContinue.getVisibility() == VISIBLE) {
+                    btnContinue.requestFocus();
+                } else if (btnPause.getVisibility() == VISIBLE) {
+                    btnPause.requestFocus();
+                }
+            } else if (DIR == TouchHandlerListener.DIR_RIGHT) {
+                btnSwitchCamera2.requestFocus();
+            } else if (DIR == TouchHandlerListener.DIR_UP) {
+                btnExitApp.requestFocus();
+            }
+        } else if (btnSwitchCamera2.isFocused()) {
+            if (DIR == TouchHandlerListener.DIR_LEFT) {
+                Log.d("RAMBO","当前镜头2，点击左边按钮了");
+                btnStop.requestFocus();
+            } else if (DIR == TouchHandlerListener.DIR_UP) {
+                btnExitApp.requestFocus();
+            }
+        }
+    }
+
 }

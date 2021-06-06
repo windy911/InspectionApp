@@ -15,10 +15,12 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="60dp"
         android:text="开始"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:textSize="18sp"
         android:textStyle="bold"
         android:textColor="#FFFFFF"
-        android:background="@drawable/bg_login" />
+        android:background="@drawable/selector_button" />
 
     <LinearLayout android:layout_width="wrap_content"
         android:layout_alignParentBottom="true"
@@ -30,36 +32,37 @@
         android:visibility="gone"
         android:layout_height="wrap_content">
 
-        <Button
+        <com.pm.cameraui.widget.MyButton
             android:id="@+id/btnPause"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:background="@drawable/ic_pause" />
+            android:background="@drawable/selector_pause" />
 
-        <Button
+        <com.pm.cameraui.widget.MyButton
             android:id="@+id/btnContinue"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:visibility="gone"
-            android:background="@drawable/ic_continue" />
+            android:background="@drawable/selector_continue" />
 
-        <Button
+        <com.pm.cameraui.widget.MyButton
             android:id="@+id/btnStop"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginLeft="16dp"
-            android:background="@drawable/ic_stop" />
+            android:background="@drawable/selector_stop" />
 
-        <Button
-            android:id="@+id/btnTakePic"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:visibility="gone"
-            android:layout_marginLeft="16dp"
-            android:background="@drawable/ic_take_photo" />
 
-        <Button
+        <com.pm.cameraui.widget.MyButton
             android:id="@+id/btnSwitchCamera2"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginLeft="16dp"
@@ -69,23 +72,26 @@
     </LinearLayout>
 
 
-    <Button
+    <com.pm.cameraui.widget.MyButton
         android:id="@+id/btnSwitchCamera"
         android:layout_width="48dp"
         android:layout_height="48dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:layout_alignParentRight="true"
         android:layout_margin="48dp"
         android:layout_marginBottom="48dp"
-        android:background="@drawable/icon_camera_switch" />
+        android:background="@drawable/selector_camera_switch" />
 
-    <Button
+    <com.pm.cameraui.widget.MyButton
         android:id="@+id/btnExitApp"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_margin="48dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:layout_marginBottom="48dp"
-        android:background="@drawable/ic_baseline_exit_to_app_24" />
-
+        android:background="@drawable/selector_exit" />
 
 
     <LinearLayout android:layout_width="wrap_content"
@@ -131,7 +137,6 @@
             android:textStyle="bold"
             android:textColor="@color/green"
             android:layout_height="wrap_content"/>
-
         <ProgressBar android:id="@+id/voiceProgress"
             android:layout_width="100dp"
             android:layout_marginBottom="8dp"

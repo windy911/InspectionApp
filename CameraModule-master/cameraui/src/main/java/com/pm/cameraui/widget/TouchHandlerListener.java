@@ -21,4 +21,11 @@ public interface TouchHandlerListener {
 
     //向上滑动
     public void slideUp();
+    public void slideLeft();
+    public void slideRight();
+
+    public static final int DIR_LEFT = 0;
+    public static final int DIR_RIGHT = 1;
+    public static final int DIR_UP = 2;
+    public static final int DIR_DOWN = 3;
 }

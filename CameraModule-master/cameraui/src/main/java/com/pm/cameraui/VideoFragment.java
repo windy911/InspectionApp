@@ -44,6 +44,7 @@ import com.pm.cameraui.widget.CameraController;
 import com.pm.cameraui.widget.MyVidoeController;
 import com.pm.cameraui.widget.ShareDialog;
 import com.pm.cameraui.widget.TopicSelectDialog;
+import com.pm.cameraui.widget.TouchHandlerListener;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -57,7 +58,7 @@ import java.util.TimerTask;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-public class VideoFragment extends BaseFragment<VideoPresenter> implements DelegateCallback, VideoView {
+public class VideoFragment extends BaseFragment<VideoPresenter> implements DelegateCallback, VideoView, TouchHandlerListener {
 
     private AutoFitTextureView mTextureView;
     private CameraController mController;
@@ -192,7 +193,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
 
             @Override
             public void onExitApp() {
-                CameraActivity.instance.onBackPressed();
+                CameraActivity.instance.finish();
             }
         });
         mController.setVisibility(View.GONE);
@@ -207,6 +208,10 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         showLoading(false);
 
         startBackgroundUpload();
+
+
+
+
     }
 
     //后台上传本地数据
@@ -220,6 +225,10 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
             public void run() {
                 try {
                     //先切换镜头
+
+                    //切换摄像头的5秒内不相应onCLick
+                    CameraActivity.instance.lastClickedTime = System.currentTimeMillis()+5000;
+
                     Message msg = new Message();
                     msg.what = HANDLER_SWITCH_CAMERA;
                     uiHandler.sendMessageDelayed(msg, 1000);
@@ -626,7 +635,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         audioStartTimeLong = System.currentTimeMillis();
         markRecord();
         isForVoiceMark = true;
-
+        audioDownTime = System.currentTimeMillis();
     }
 
     //长按结束
@@ -810,4 +819,56 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     }
 
 
+    @Override
+    public void updateCursorPos(int cursorPos) {
+
+    }
+
+    @Override
+    public void doScrollX(int dx) {
+
+    }
+
+    @Override
+    public void doFling(int speedX) {
+
+    }
+
+    @Override
+    public void doTouchupNoMove() {
+
+    }
+
+    @Override
+    public void doTouchUp() {
+
+    }
+
+    @Override
+    public void slideDown() {
+        slideFocusChange(TouchHandlerListener.DIR_DOWN);
+    }
+
+    @Override
+    public void slideUp() {
+        slideFocusChange(TouchHandlerListener.DIR_UP);
+    }
+
+    @Override
+    public void slideLeft() {
+        slideFocusChange(TouchHandlerListener.DIR_LEFT);
+    }
+
+    @Override
+    public void slideRight() {
+        slideFocusChange(TouchHandlerListener.DIR_RIGHT);
+    }
+
+    public void slideFocusChange(int DIR) {
+        myVideoController.slideFocusChange(DIR);
+    }
+
+    public void clicked(){
+        myVideoController.onClicked();
+    }
 }
