@@ -26,6 +26,8 @@ import com.pm.cameracore.RecordDelegate;
 import com.pm.cameraui.base.BaseFragment;
 import com.pm.cameraui.bean.InspectRecord;
 import com.pm.cameraui.bean.Mark;
+import com.pm.cameraui.bean.RecordSave;
+import com.pm.cameraui.bean.RecordSaveList;
 import com.pm.cameraui.bean.Topic;
 import com.pm.cameraui.bean.UploadStatus;
 import com.pm.cameraui.mvp.VideoPresenter;
@@ -33,6 +35,7 @@ import com.pm.cameraui.mvp.VideoView;
 import com.pm.cameraui.utils.FileUtils;
 import com.pm.cameraui.utils.LocationUtil;
 import com.pm.cameraui.utils.MarkUtil;
+import com.pm.cameraui.utils.RecordSaveUtils;
 import com.pm.cameraui.utils.RecordUtil;
 import com.pm.cameraui.utils.TimeUtil;
 import com.pm.cameraui.utils.UploadUtil;
@@ -185,7 +188,6 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
                     //如果不在录制，则直接切换摄像头
                     switchCameraID();
                 }
-
             }
 
             @Override
@@ -203,6 +205,13 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
             }
         });
         showLoading(false);
+
+        startBackgroundUpload();
+    }
+
+    //后台上传本地数据
+    public void startBackgroundUpload() {
+        uiHandler.sendEmptyMessageDelayed(HANDLER_UPLOAD_BACKGROUD, 5000);
     }
 
     public void startTaskForSwitchCamera() {
@@ -512,7 +521,18 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
 
     @Override
     public void updateInspection(InspectRecord record) {
-        MarkUtil.generateAudioForMarks(record, markList, presenter);
+        MarkUtil.generateAudioForMarks(record, markList, presenter, false);
+    }
+
+    @Override
+    public void updateInspection2(RecordSave recordSave) {
+        MarkUtil.generateAudioForMarks(recordSave.inspectRecord, recordSave.markList, presenter, true);
+
+        //大的总视频文件上传成功了！,删除记录条
+        RecordSaveUtils.removeRecordSave(getActivity(), recordSave);
+        if (RecordSaveUtils.haveLocalSaves(getActivity())) {
+            startBackgroundUpload();
+        }
     }
 
     //关闭当前InspcetionTopic任务，上传数据。显示对话框。拿到了合并后的视频文件地址，还有更新录制时长。
@@ -527,35 +547,45 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
                 .setOnCertainButtonClickListener(new ShareDialog.OnCertainButtonClickListener() {
                     @Override
                     public void onCertainButtonClick() {
-                        showLoading(true);
-                        uploadVideoFileToHuaWei(videoFilePath);
+//                        showLoading(true);
+//                        uploadVideoFileToHuaWei(videoFilePath);
+
+                        //1.先做本地存储
+                        RecordSave recordSave = new RecordSave(videoFilePath, inspectRecord, LocationUtil.getLocationString(), markList);
+                        RecordSaveUtils.saveRecordSaves(getActivity(), recordSave);
+                        CameraActivity.instance.hideNavigation();
+                        //2.立即上传了
+                        loadUploadSave();
+
+                        presenter.getInspectionTopic();
                     }
                 }).show(getFragmentManager(), "CommonDialog");
     }
 
+//显示上传状态。。。
 
-    public void uploadVideoFileToHuaWei(String videoFilePath) {
-        UploadUtil.upload(videoFilePath, new ProgressListener() {
-            @Override
-            public void progressChanged(ProgressStatus progressStatus) {
-                Log.d("RAMBO progressChanged ", "percent = " + progressStatus.getTransferPercentage());
-                strProgress = "" + progressStatus.getTransferPercentage() + "%";
-                Message message = new Message();
-                message.what = HANDLER_UPDATE_PROGRESS;
-                uiHandler.sendMessage(message);
-            }
-        }, new UploadUtil.OnUploadsListener() {
-            @Override
-            public void onUploadSuccess(String localPath, String remoteUrl) {
-                inspectRecord.setLocalVideoFilePath(localPath);
-                inspectRecord.setVideoUrl(remoteUrl);
-                inspectRecord.setUploadStatus(UploadStatus.UPLOAD_SUCCESS);
-                inspectRecord.setTraceLocus(LocationUtil.getLocationString());
-                LocationUtil.clearAll();
-                presenter.updateInspectRecord(inspectRecord);
-            }
-        });
-    }
+//    public void uploadVideoFileToHuaWei(String videoFilePath) {
+//        UploadUtil.upload(videoFilePath, new ProgressListener() {
+//            @Override
+//            public void progressChanged(ProgressStatus progressStatus) {
+//                Log.d("RAMBO progressChanged ", "percent = " + progressStatus.getTransferPercentage());
+//                strProgress = "" + progressStatus.getTransferPercentage() + "%";
+//                Message message = new Message();
+//                message.what = HANDLER_UPDATE_PROGRESS;
+//                uiHandler.sendMessage(message);
+//            }
+//        }, new UploadUtil.OnUploadsListener() {
+//            @Override
+//            public void onUploadSuccess(String localPath, String remoteUrl) {
+//                inspectRecord.setLocalVideoFilePath(localPath);
+//                inspectRecord.setVideoUrl(remoteUrl);
+//                inspectRecord.setUploadStatus(UploadStatus.UPLOAD_SUCCESS);
+//                inspectRecord.setTraceLocus(LocationUtil.getLocationString());
+//                LocationUtil.clearAll();
+//                presenter.updateInspectRecord(inspectRecord);
+//            }
+//        });
+//    }
 
     //添加标签，首先拍照等回调
     public void markRecord() {
@@ -712,7 +742,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     @Override
     public void onTaskFinish() {
         //不弹出多个场景选择器
-        if(!isFinishedTask){
+        if (!isFinishedTask) {
             isFinishedTask = true;
             Message message = new Message();
             message.what = HANDLER_FINISHED_TASK;
@@ -725,6 +755,8 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     public static final int HANDLER_UPDATE_PROGRESS = 1;
     public static final int HANDLER_SWITCH_CAMERA = 2;
     public static final int HANDLER_CONTINUE_RECORD = 3;
+    public static final int HANDLER_UPLOAD_BACKGROUD = 4;
+
     private Handler uiHandler = new Handler() {
         public void handleMessage(Message msg) {
             if (msg.what == HANDLER_FINISHED_TASK) {
@@ -737,9 +769,45 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
                 switchCameraID();
             } else if (msg.what == HANDLER_CONTINUE_RECORD) {
                 continueRecording();
+            } else if (msg.what == HANDLER_UPLOAD_BACKGROUD) {
+                loadUploadSave();
             }
         }
     };
+
+
+    //后台载入未上传数据，做上传处理
+    public void loadUploadSave() {
+        RecordSaveList recordSaveList = RecordSaveUtils.loadAllRecordSave(getActivity());
+        int size = recordSaveList.recordSaves.size();
+        Log.d("RAMBO", "本地有未上传数据：" + size + "条！");
+        if (size > 0) {
+            RecordSave recordSave = recordSaveList.recordSaves.get(recordSaveList.recordSaves.size() - 1);
+            uploadSave(recordSave);
+        }
+    }
+
+    public void uploadSave(RecordSave recordSave) {
+        uploadVideoFileToHuaWei_2(recordSave);
+    }
+
+    public void uploadVideoFileToHuaWei_2(RecordSave recordSave) {
+        UploadUtil.upload(recordSave.videoFilePath, new ProgressListener() {
+            @Override
+            public void progressChanged(ProgressStatus progressStatus) {
+                Log.d("RAMBO", "uploadVideoFileToHuaWei_2 percent = " + progressStatus.getTransferPercentage());
+            }
+        }, new UploadUtil.OnUploadsListener() {
+            @Override
+            public void onUploadSuccess(String localPath, String remoteUrl) {
+                recordSave.inspectRecord.setLocalVideoFilePath(localPath);
+                recordSave.inspectRecord.setVideoUrl(remoteUrl);
+                recordSave.inspectRecord.setUploadStatus(UploadStatus.UPLOAD_SUCCESS);
+                recordSave.inspectRecord.setTraceLocus(LocationUtil.getLocationString());
+                presenter.updateInspectRecord2(recordSave);
+            }
+        });
+    }
 
 
 }

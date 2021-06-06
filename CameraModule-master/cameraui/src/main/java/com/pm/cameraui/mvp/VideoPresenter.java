@@ -11,6 +11,7 @@ import com.pm.cameraui.base.BasePresenter;
 import com.pm.cameraui.bean.AppConfig;
 import com.pm.cameraui.bean.InspectRecord;
 import com.pm.cameraui.bean.Mark;
+import com.pm.cameraui.bean.RecordSave;
 import com.pm.cameraui.bean.Topic;
 import com.pm.cameraui.bean.UserInfo;
 import com.pm.cameraui.utils.MarkUtil;
@@ -106,6 +107,21 @@ public class VideoPresenter extends BasePresenter<VideoView> {
         });
     }
 
+    public void updateInspectRecord2(RecordSave recordSave){
+        addDisposable(apiServer.updateInspectRecord(recordSave.inspectRecord), new BaseObserver<InspectRecord>(baseView) {
+            @Override
+            public void onSuccess(InspectRecord o) {
+                recordSave.inspectRecord = o;
+                baseView.updateInspection2(recordSave);
+                Log.d("RAMBO","InspectRecord 上传成功："+o.toString());
+            }
+            @Override
+            public void onError(String msg) {
+                baseView.showError(msg);
+            }
+        });
+    }
+
 
     public void addMarkRecord(Mark mark){
         addDisposable(apiServer.addMarkRecord(mark), new BaseObserver<Mark>(baseView) {
@@ -121,9 +137,35 @@ public class VideoPresenter extends BasePresenter<VideoView> {
     }
 
     public void updateMarkRecord(Mark mark){
-
+        Log.d("RAMBO","updateMarkRecord()");
         if(baseView!=null&&mark==null){
             baseView.onTaskFinish();
+            return;
+        }
+
+        addDisposable(apiServer.updateMarkRecord(mark), new BaseObserver<Mark>(baseView) {
+
+            @Override
+            public void onSuccess(Mark o) {
+
+                Log.d("RAMBO","updateMarkRecord Success :" +mark.toString());
+                if(MarkUtil.isFinishUpload()){
+                    baseView.onTaskFinish();
+                }
+            }
+            @Override
+            public void onError(String msg) {
+                baseView.showError(msg);
+            }
+        });
+
+    }
+
+    public void updateMarkRecord2(Mark mark){
+
+        Log.d("RAMBO","updateMarkRecord2()");
+        if(baseView!=null&&mark==null){
+
             return;
         }
 
@@ -131,9 +173,9 @@ public class VideoPresenter extends BasePresenter<VideoView> {
             @Override
             public void onSuccess(Mark o) {
                 Log.d("RAMBO","updateMarkRecord Success :" +mark.toString());
-                if(MarkUtil.isFinishUpload()){
-                    baseView.onTaskFinish();
-                }
+//                if(MarkUtil.isFinishUpload()){
+//                    baseView.onTaskFinish();
+//                }
             }
             @Override
             public void onError(String msg) {

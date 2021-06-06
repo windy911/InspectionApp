@@ -62,7 +62,7 @@ public class MarkUtil {
      * @param record
      */
     public static int markUploadCount = 0;
-    public static void generateAudioForMarks(InspectRecord record, List<Mark> markList, VideoPresenter presenter){
+    public static void generateAudioForMarks(InspectRecord record, List<Mark> markList, VideoPresenter presenter,boolean isBackground){
 
         resetUploadCount();
 
@@ -93,7 +93,11 @@ public class MarkUtil {
 //                                            DaoManager.getInstance().getSession().getMarkDao().update(mark);
 //                                            inspectVM.updateMarkRecord(mark);
                                             delUploadCount();
-                                            presenter.updateMarkRecord(mark);
+                                            if(isBackground){
+                                                presenter.updateMarkRecord2(mark);
+                                            }else {
+                                                presenter.updateMarkRecord(mark);
+                                            }
                                         });
                                     }
                                     @Override
@@ -107,7 +111,12 @@ public class MarkUtil {
                         threadPool.execute(markTask);
                         try {
                             if(isFinishUpload()){
-                                presenter.updateMarkRecord(null);
+                                if(isBackground){
+                                    presenter.updateMarkRecord2(null);
+                                }else {
+                                    presenter.updateMarkRecord(null);
+                                }
+
                             }
                             Thread.sleep(2000);
                         } catch (InterruptedException e) {
@@ -117,7 +126,11 @@ public class MarkUtil {
                 }
                 //没有需要分割上传的VoiceMark，直接就Finish。
                 if(isFinishUpload()){
-                    presenter.updateMarkRecord(null);
+                    if(isBackground){
+                        presenter.updateMarkRecord2(null);
+                    }else {
+                        presenter.updateMarkRecord(null);
+                    }
                 }
             }
         }).start();
