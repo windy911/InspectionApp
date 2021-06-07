@@ -48,10 +48,6 @@ public class MyVidoeController extends RelativeLayout {
         llRecording = findViewById(R.id.llRecording);
         btnSwitchCamera = findViewById(R.id.btnSwitchCamera);
         btnSwitchCamera2 = findViewById(R.id.btnSwitchCamera2);
-        //暂时不需要显示该按钮在眼镜上由按键触发
-//        btnTakePic.setVisibility(View.GONE);
-        //暂时隐藏该截图，业务上不需要显示
-//        imgPreview.setVisibility(View.GONE);
         tvRedDot = findViewById(R.id.tvRedDot);
         tvTimer = findViewById(R.id.tvTimer);
         tvRedDot.setVisibility(View.GONE);
@@ -132,6 +128,7 @@ public class MyVidoeController extends RelativeLayout {
         btnStart.setVisibility(isRecording ? View.GONE : View.VISIBLE);
         llRecording.setVisibility(isRecording ? View.VISIBLE : View.GONE);
         btnSwitchCamera.setVisibility(isRecording ? View.GONE : View.VISIBLE);
+        btnPause.requestFocus();
     }
 
     public void setPreViewImage(Bitmap bitmap) {
@@ -147,6 +144,7 @@ public class MyVidoeController extends RelativeLayout {
     public void continueRecording() {
         btnPause.setVisibility(View.VISIBLE);
         btnContinue.setVisibility(View.GONE);
+        btnPause.requestFocus();
     }
 
     public void setRecordDotShow(boolean isShow) {
