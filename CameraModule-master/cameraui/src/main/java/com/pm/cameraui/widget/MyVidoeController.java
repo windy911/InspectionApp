@@ -5,6 +5,8 @@ import android.graphics.Bitmap;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -19,10 +21,11 @@ public class MyVidoeController extends RelativeLayout {
     CameraController.ControllerCallback mCallback;
     Button btnStart, btnSwitchCamera, btnSwitchCamera2, btnStop, btnContinue, btnPause, btnExitApp;
     LinearLayout llRecording;
+    LinearLayout llbtnContinue,llbtnPause;
     TextView tvRedDot, tvTimer;
     ProgressBar voiceProgress;
     LinearLayout llVoiceMark;
-
+    boolean isTaskRecording = false;
 
     public MyVidoeController(Context context) {
         super(context);
@@ -41,9 +44,12 @@ public class MyVidoeController extends RelativeLayout {
 
     private void init(Context context, AttributeSet atts) {
         inflate(context, R.layout.layout_controller_view, this);
+        isTaskRecording = false;
         btnStart = findViewById(R.id.btnStart);
         btnPause = findViewById(R.id.btnPause);
         btnContinue = findViewById(R.id.btnContinue);
+        llbtnPause = findViewById(R.id.llbtnPause);
+        llbtnContinue = findViewById(R.id.llbtnContinue);
         btnStop = findViewById(R.id.btnStop);
         llRecording = findViewById(R.id.llRecording);
         btnSwitchCamera = findViewById(R.id.btnSwitchCamera);
@@ -126,9 +132,15 @@ public class MyVidoeController extends RelativeLayout {
 
     public void refreshUIRecord(boolean isRecording) {
         btnStart.setVisibility(isRecording ? View.GONE : View.VISIBLE);
+        btnExitApp.setVisibility(isRecording ? View.GONE : View.VISIBLE);
         llRecording.setVisibility(isRecording ? View.VISIBLE : View.GONE);
         btnSwitchCamera.setVisibility(isRecording ? View.GONE : View.VISIBLE);
         btnPause.requestFocus();
+        isTaskRecording = isRecording;
+    }
+
+    public void startInit() {
+        btnStart.requestFocus();
     }
 
     public void setPreViewImage(Bitmap bitmap) {
@@ -136,14 +148,14 @@ public class MyVidoeController extends RelativeLayout {
     }
 
     public void pauseRecording() {
-        btnPause.setVisibility(View.GONE);
-        btnContinue.setVisibility(View.VISIBLE);
+        llbtnPause.setVisibility(View.GONE);
+        llbtnContinue.setVisibility(View.VISIBLE);
         btnContinue.requestFocus();
     }
 
     public void continueRecording() {
-        btnPause.setVisibility(View.VISIBLE);
-        btnContinue.setVisibility(View.GONE);
+        llbtnPause.setVisibility(View.VISIBLE);
+        llbtnContinue.setVisibility(View.GONE);
         btnPause.requestFocus();
     }
 
@@ -163,11 +175,16 @@ public class MyVidoeController extends RelativeLayout {
         Log.d("RAMBO", "voice progress = " + progress);
         llVoiceMark.setVisibility(View.VISIBLE);
         voiceProgress.setMax(100);
-        voiceProgress.setProgress(progress);
+        voiceProgress.setProgress(100-progress);
     }
 
     public void hideVoiceMarker() {
         llVoiceMark.setVisibility(View.GONE);
+    }
+
+    public void showBackgroundAction(boolean isShow) {
+        btnSwitchCamera.setVisibility(isShow ? View.VISIBLE : View.GONE);
+        btnExitApp.setVisibility(isShow ? View.VISIBLE : View.GONE);
     }
 
 
@@ -189,8 +206,26 @@ public class MyVidoeController extends RelativeLayout {
         }
     }
 
+    public void facousPauseOrContinue() {
+        if (llbtnContinue.getVisibility() == View.VISIBLE) {
+            btnContinue.requestFocus();
+        } else if (llbtnPause.getVisibility() == View.VISIBLE) {
+            btnPause.requestFocus();
+        }
+    }
+
     public void slideFocusChange(int DIR) {
+
+
         Log.d("RAMBO", "MyVideoController SlideChange = " + DIR);
+
+        if (DIR == TouchHandlerListener.DIR_UP && btnStart.getVisibility() == View.GONE && llRecording.getVisibility()==View.GONE) {
+            showOrHideControl(true);
+            facousPauseOrContinue();
+            return;
+        }
+
+
         if (btnStart.isFocused()) {
             if (DIR == TouchHandlerListener.DIR_UP || DIR == TouchHandlerListener.DIR_LEFT) {
                 btnExitApp.requestFocus();
@@ -202,9 +237,9 @@ public class MyVidoeController extends RelativeLayout {
                 if (btnSwitchCamera.getVisibility() == View.VISIBLE) {
                     btnSwitchCamera.requestFocus();
                 } else {
-                    if (btnPause.getVisibility() == View.VISIBLE) {
+                    if (llbtnPause.getVisibility() == View.VISIBLE) {
                         btnPause.requestFocus();
-                    } else if (btnContinue.getVisibility() == View.VISIBLE) {
+                    } else if (llbtnContinue.getVisibility() == View.VISIBLE) {
                         btnContinue.requestFocus();
                     }
                 }
@@ -212,9 +247,9 @@ public class MyVidoeController extends RelativeLayout {
                 if (btnStart.getVisibility() == VISIBLE) {
                     btnStart.requestFocus();
                 } else {
-                    if (btnContinue.getVisibility() == View.VISIBLE) {
+                    if (llbtnContinue.getVisibility() == View.VISIBLE) {
                         btnContinue.requestFocus();
-                    } else if (btnPause.getVisibility() == View.VISIBLE) {
+                    } else if (llbtnPause.getVisibility() == View.VISIBLE) {
                         btnPause.requestFocus();
                     }
                 }
@@ -226,37 +261,84 @@ public class MyVidoeController extends RelativeLayout {
                 btnStart.requestFocus();
             }
         } else if (btnPause.isFocused()) {
-            if (DIR == TouchHandlerListener.DIR_LEFT || DIR == TouchHandlerListener.DIR_UP) {
+            if (DIR == TouchHandlerListener.DIR_LEFT) {
                 btnExitApp.requestFocus();
+            } else if (DIR == TouchHandlerListener.DIR_UP) {
+//                showOrHideControl(true);
             } else if (DIR == TouchHandlerListener.DIR_RIGHT) {
                 btnStop.requestFocus();
+            } else if (DIR == TouchHandlerListener.DIR_DOWN) {
+                showOrHideControl(false);
             }
         } else if (btnContinue.isFocused()) {
-            if (DIR == TouchHandlerListener.DIR_LEFT || DIR == TouchHandlerListener.DIR_UP) {
+            if (DIR == TouchHandlerListener.DIR_LEFT) {
                 btnExitApp.requestFocus();
+            } else if (DIR == TouchHandlerListener.DIR_UP) {
+//                showOrHideControl(true);
             } else if (DIR == TouchHandlerListener.DIR_RIGHT) {
                 btnStop.requestFocus();
+            } else if (DIR == TouchHandlerListener.DIR_DOWN) {
+                showOrHideControl(false);
             }
         } else if (btnStop.isFocused()) {
             if (DIR == TouchHandlerListener.DIR_LEFT) {
-                if (btnContinue.getVisibility() == VISIBLE) {
+                if (llbtnContinue.getVisibility() == VISIBLE) {
                     btnContinue.requestFocus();
-                } else if (btnPause.getVisibility() == VISIBLE) {
+                } else if (llbtnPause.getVisibility() == VISIBLE) {
                     btnPause.requestFocus();
                 }
             } else if (DIR == TouchHandlerListener.DIR_RIGHT) {
                 btnSwitchCamera2.requestFocus();
             } else if (DIR == TouchHandlerListener.DIR_UP) {
-                btnExitApp.requestFocus();
+//                btnExitApp.requestFocus();
+//                showOrHideControl(true);
+            } else if (DIR == TouchHandlerListener.DIR_DOWN) {
+                showOrHideControl(false);
             }
         } else if (btnSwitchCamera2.isFocused()) {
             if (DIR == TouchHandlerListener.DIR_LEFT) {
-                Log.d("RAMBO","当前镜头2，点击左边按钮了");
+                Log.d("RAMBO", "当前镜头2，点击左边按钮了");
                 btnStop.requestFocus();
             } else if (DIR == TouchHandlerListener.DIR_UP) {
-                btnExitApp.requestFocus();
+//                btnExitApp.requestFocus();
+//                showOrHideControl(true);
+            } else if (DIR == TouchHandlerListener.DIR_DOWN) {
+                showOrHideControl(false);
             }
         }
     }
+
+    public boolean isStarted() {
+        return !(btnStart.getVisibility() == View.VISIBLE);
+    }
+
+    public void showOrHideControl(boolean isShow) {
+
+        if (!isTaskRecording) {
+            return;
+        }
+
+
+        // 初始化需要加载的动画资源
+        Animation animation = AnimationUtils.loadAnimation(getContext(), isShow ? R.anim.view_translate_in : R.anim.view_translate_out);
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                llRecording.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                llRecording.setVisibility(isShow ? View.VISIBLE : View.GONE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        llRecording.startAnimation(animation);
+    }
+
 
 }

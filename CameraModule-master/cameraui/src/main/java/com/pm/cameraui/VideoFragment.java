@@ -15,6 +15,7 @@ import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -404,11 +405,13 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         }
     }
 
+
     //合成列表的视频成为一个整视频
     public void mergeSaveList() {
         Log.d("RAMBO", "视频任务拍摄结束：开始MergeSaveList");
         resetUI();
         String mergeVideoPath = createVideoFilePath(getActivity());
+        showLoading(true);
         UploadUtil.mergeVideos(getActivity(), mergeVideoPath, recordFileList, new UploadUtil.OnMergeSuccessListener() {
             @Override
             public void onMergeSuccess(String outFile) {
@@ -550,7 +553,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         inspectRecord = RecordUtil.endRecord(inspectRecord, savePeriodTime);
         new ShareDialog(inspectRecord)
                 .setTitle(inspectRecord.getName())
-                .setConfirm("立即上传")
+                .setConfirm("结束并自动上传")
                 .setCancel("稍后上传")
                 .setDialogCancelable(false)
                 .setOnCertainButtonClickListener(new ShareDialog.OnCertainButtonClickListener() {
@@ -565,10 +568,17 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
                         CameraActivity.instance.hideNavigation();
                         //2.立即上传了
                         loadUploadSave();
-
                         presenter.getInspectionTopic();
+
+                        Message message = new Message();
+                        message.what = HANDLER_SHOW_BG_ACTION;
+                        uiHandler.sendMessage(message);
                     }
                 }).show(getFragmentManager(), "CommonDialog");
+
+        Message message = new Message();
+        message.what = HANDLER_HIDE_BG_ACTION;
+        uiHandler.sendMessage(message);
     }
 
 //显示上传状态。。。
@@ -735,8 +745,14 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
 
     @Override
     public void showTopicList(List<Topic> topics) {
-        TopicSelectDialog dialog = new TopicSelectDialog(topics);
+        TopicSelectDialog dialog = new TopicSelectDialog(topics, new TopicSelectDialog.OnDialogAction() {
+            @Override
+            public void onDismiss() {
+                myVideoController.startInit();
+            }
+        });
         dialog.show(getFragmentManager(), "TopicDialog");
+
     }
 
     @Override
@@ -765,6 +781,8 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     public static final int HANDLER_SWITCH_CAMERA = 2;
     public static final int HANDLER_CONTINUE_RECORD = 3;
     public static final int HANDLER_UPLOAD_BACKGROUD = 4;
+    public static final int HANDLER_HIDE_BG_ACTION = 5;
+    public static final int HANDLER_SHOW_BG_ACTION = 6;
 
     private Handler uiHandler = new Handler() {
         public void handleMessage(Message msg) {
@@ -780,6 +798,11 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
                 continueRecording();
             } else if (msg.what == HANDLER_UPLOAD_BACKGROUD) {
                 loadUploadSave();
+            }else if (msg.what == HANDLER_HIDE_BG_ACTION) {
+                myVideoController.showBackgroundAction(false);
+                showLoading(false);
+            }else if (msg.what == HANDLER_SHOW_BG_ACTION) {
+                myVideoController.showBackgroundAction(true);
             }
         }
     };
@@ -870,5 +893,9 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
 
     public void clicked(){
         myVideoController.onClicked();
+    }
+
+    public void showOrHideControl(boolean isShow){
+        Log.d("RAMBO",isShow?"showControler":"hideControler");
     }
 }

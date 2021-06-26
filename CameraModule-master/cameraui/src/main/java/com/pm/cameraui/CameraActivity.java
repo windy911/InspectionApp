@@ -10,6 +10,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
@@ -170,6 +171,7 @@ public class CameraActivity extends AppCompatActivity implements TouchHandlerLis
                         LocationUtil.locationList.add(new InsLocation(amapLocation.getLatitude() + "", amapLocation.getLongitude() + "", "", System.currentTimeMillis()));
                         //可在其中解析amapLocation获取相应内容。
                         Log.e("RAMBO", "size = " + LocationUtil.locationList.size() + " 经度:" + amapLocation.getLatitude() + ", 维度:" + amapLocation.getLongitude());
+//                        Toast.makeText(CameraActivity.this, " 经度:" + amapLocation.getLatitude() + ", 维度:" + amapLocation.getLongitude(),Toast.LENGTH_SHORT).show();
                     }
                 }
             }

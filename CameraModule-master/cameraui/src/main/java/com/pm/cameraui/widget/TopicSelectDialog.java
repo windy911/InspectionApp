@@ -35,6 +35,7 @@ public class TopicSelectDialog extends DialogFragment implements View.OnClickLis
     private MyHorizontalScrollView hscrollView;
     RelativeLayout rlTopicContent;
     private int currentIndex = 0;
+    private OnDialogAction onDialogAction;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -43,9 +44,10 @@ public class TopicSelectDialog extends DialogFragment implements View.OnClickLis
         getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
 
-    public TopicSelectDialog(List<Topic> topics) {
+    public TopicSelectDialog(List<Topic> topics,OnDialogAction cb) {
         setStyle(STYLE_NO_TITLE, R.style.topic_dialog_style);
         this.topicList = topics;
+        this.onDialogAction = cb;
     }
 
     @Nullable
@@ -108,13 +110,13 @@ public class TopicSelectDialog extends DialogFragment implements View.OnClickLis
 
         if (topicList != null && topicList.size() > 0) {
             selectedIndex(0);
+            clearIndexSign();
         }
 
         confirmButton.requestFocus();
 
 
         getDialog().getWindow().getDecorView().setOnTouchListener(new View.OnTouchListener() {
-
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 onTouchEvent(motionEvent);
@@ -133,6 +135,9 @@ public class TopicSelectDialog extends DialogFragment implements View.OnClickLis
         if (view.getId() == R.id.topic_tag_confirm) {
             Constants.CURRENT_TOPIC = selectTopic;
             dismiss();
+            if(onDialogAction!=null){
+                onDialogAction.onDismiss();
+            }
         }
     }
 
@@ -141,7 +146,6 @@ public class TopicSelectDialog extends DialogFragment implements View.OnClickLis
         selectTopic = topicList.get(index);
         for (int i = 0; i < topicViews.size(); i++) {
             topicViews.get(i).setSelected(index == i);
-
             if (index == i) {
                 //计算屏幕的宽度
                 WindowManager wm1 = getActivity().getWindowManager();
@@ -150,8 +154,19 @@ public class TopicSelectDialog extends DialogFragment implements View.OnClickLis
                 hscrollView.smoothScrollTo(rb_px - screenWidth / 2, 0);
             }
         }
-
         hscrollView.clearFocus();
+    }
+
+    public void clearIndexSign(){
+        for (int i = 0; i < topicViews.size(); i++) {
+            topicViews.get(i).setSelected2(currentIndex == i);
+        }
+    }
+
+    public void addIndexSing(){
+        for (int i = 0; i < topicViews.size(); i++) {
+            topicViews.get(i).setSelected(currentIndex == i);
+        }
     }
 
     public void selectNextTopic() {
@@ -186,15 +201,20 @@ public class TopicSelectDialog extends DialogFragment implements View.OnClickLis
         if (DIR == TouchHandlerListener.DIR_DOWN) {
             if (tvHide.isFocused()) {
                 confirmButton.requestFocus();
+                clearIndexSign();
             } else if (btnExit.isFocused()) {
                 tvHide.requestFocus();
+                addIndexSing();
             }
         } else if (DIR == TouchHandlerListener.DIR_UP) {
             if (confirmButton.isFocused()) {
                 tvHide.requestFocus();
+                addIndexSing();
             } else if (tvHide.isFocused()) {
                 btnExit.requestFocus();
+                clearIndexSign();
             } else if (btnExit.isFocused()) {
+                clearIndexSign();
                 confirmButton.requestFocus();
             }
         } else if (DIR == TouchHandlerListener.DIR_LEFT) {
@@ -209,6 +229,9 @@ public class TopicSelectDialog extends DialogFragment implements View.OnClickLis
             selectNextTopic();
         }
     }
+
+
+
 
     public void clicked() {
         if (btnExit.isFocused()) {
@@ -316,5 +339,9 @@ public class TopicSelectDialog extends DialogFragment implements View.OnClickLis
             //Y轴移动
             return dy > 0 ? 'b' : 't';
         }
+    }
+
+    public interface OnDialogAction{
+        void onDismiss();
     }
 }

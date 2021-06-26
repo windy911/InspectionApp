@@ -128,7 +128,6 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainVie
             showSoftInputFromWindow(getActivity(),edtLoginName);
         } else if (edtLoginPswd.isFocused()) {
             showSoftInputFromWindow(getActivity(),edtLoginPswd);
-
         } else if (btnLogin.isFocused()) {
             btnLogin.performClick();
         }
