@@ -350,7 +350,9 @@ public class CameraActivity extends AppCompatActivity implements TouchHandlerLis
                 downY = 0;
                 break;
         }
-      return super.onTouchEvent(event);
+
+        return false;
+//      return super.onTouchEvent(event);
     }
 
 }

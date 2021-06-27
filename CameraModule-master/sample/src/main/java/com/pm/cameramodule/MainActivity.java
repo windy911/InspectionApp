@@ -292,7 +292,8 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainVie
                 }
                 break;
         }
-        return super.onTouchEvent(event);
+        return false;
+//         return super.onTouchEvent(event);
     }
 
     /**

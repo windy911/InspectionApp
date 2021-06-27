@@ -98,11 +98,24 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_alignParentRight="true"
-            android:layout_margin="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="16dp"
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:background="@drawable/selector_exit"
             />
+
+        <TextView android:id="@+id/tvExit"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:text="退出登录"
+            android:layout_marginTop="2dp"
+            android:layout_marginRight="16dp"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/btnExit"
+            android:layout_height="wrap_content"/>
 
     </RelativeLayout>
 

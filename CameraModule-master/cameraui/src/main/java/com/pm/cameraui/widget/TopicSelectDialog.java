@@ -25,7 +25,7 @@ import androidx.fragment.app.DialogFragment;
 
 public class TopicSelectDialog extends DialogFragment implements View.OnClickListener {
 
-    private TextView confirmButton, tvHide;
+    private TextView confirmButton, tvHide,tvExit;
     private MyButton btnExit;
     private Topic selectTopic;
     private List<Topic> topicList;
@@ -62,6 +62,7 @@ public class TopicSelectDialog extends DialogFragment implements View.OnClickLis
         arrowRight = mView.findViewById(R.id.arrowRight);
         hscrollView = mView.findViewById(R.id.hscrollView);
         btnExit = mView.findViewById(R.id.btnExit);
+        tvExit = mView.findViewById(R.id.tvExit);
         tvHide = mView.findViewById(R.id.tvHide);
         hscrollView.setOnTouchListener(null);
 
@@ -114,6 +115,13 @@ public class TopicSelectDialog extends DialogFragment implements View.OnClickLis
         }
 
         confirmButton.requestFocus();
+
+        btnExit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                tvExit.setVisibility(b?View.VISIBLE:View.GONE);
+            }
+        });
 
 
         getDialog().getWindow().getDecorView().setOnTouchListener(new View.OnTouchListener() {
@@ -239,6 +247,7 @@ public class TopicSelectDialog extends DialogFragment implements View.OnClickLis
         } else {
             if (!confirmButton.isFocused()) {
                 confirmButton.requestFocus();
+                clearIndexSign();
             } else if (confirmButton.isFocused()) {
                 confirmButton.performClick();
             }
