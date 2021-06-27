@@ -12,7 +12,7 @@
         android:id="@+id/btnLogin"
         android:layout_width="120dp"
         android:layout_height="48dp"
-        android:layout_marginBottom="100dp"
+        android:layout_marginBottom="40dp"
         android:background="@drawable/selector_button2"
         android:focusable="true"
         android:nextFocusUp="@id/edtLoginPswd"
@@ -27,7 +27,7 @@
 <!--    android:text="A123456"-->
     <EditText
         android:id="@+id/edtLoginPswd"
-        android:layout_width="200dp"
+        android:layout_width="240dp"
         android:layout_height="40dp"
         android:layout_marginTop="20dp"
         android:background="@drawable/selector_button"
@@ -49,7 +49,7 @@
 <!--    android:text="17700010001"-->
     <EditText
         android:id="@+id/edtLoginName"
-        android:layout_width="200dp"
+        android:layout_width="240dp"
         android:layout_height="40dp"
         android:layout_marginTop="24dp"
         android:background="@drawable/selector_button"
@@ -93,6 +93,38 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
+
+
+    <LinearLayout android:id="@+id/llRemember"
+        android:layout_width="240dp"
+        app:layout_constraintRight_toRightOf="@id/edtLoginPswd"
+        app:layout_constraintLeft_toLeftOf="@id/edtLoginName"
+        app:layout_constraintTop_toBottomOf="@id/edtLoginPswd"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_height="32dp">
+        <CheckBox android:id="@+id/cbRemmenber"
+            android:layout_width="wrap_content"
+            android:text=" 记住密码 "
+            android:textSize="12sp"
+            android:focusable="true"
+            android:padding="8dp"
+            android:focusableInTouchMode="true"
+            android:background="@drawable/selector_button3"
+            android:button="@null"
+            android:drawableLeft="@drawable/selector_checkbox"
+            android:textColor="#999999"
+            android:checked="true"
+            android:layout_height="wrap_content"/>
+        <TextView android:layout_width="match_parent"
+            android:text="轻按触控板输入"
+            android:id="@+id/tvTip"
+            android:textColor="#999999"
+            android:gravity="right"
+            android:textSize="12sp"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

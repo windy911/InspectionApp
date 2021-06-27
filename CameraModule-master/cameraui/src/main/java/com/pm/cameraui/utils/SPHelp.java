@@ -17,6 +17,7 @@ public class SPHelp {
 
     public static final String SP_LOGIN_NAME = "SP_LOGIN_NAME";
     public static final String SP_LOGIN_PASSWORD = "SP_LOGIN_PASSWORD";
+    public static final String SP_IS_REMMEMBER = "SP_IS_REMMEMBER";
 
     public static final String SP_RECORD_SAVE = "SP_RECORD_SAVE";
 

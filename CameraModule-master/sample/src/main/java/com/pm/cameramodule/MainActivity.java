@@ -11,6 +11,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -21,6 +22,7 @@ import com.pm.cameraui.bean.UserInfo;
 import com.pm.cameraui.mvp.MainPresenter;
 import com.pm.cameraui.mvp.MainView;
 import com.pm.cameraui.utils.SPHelp;
+import com.pm.cameraui.utils.ToastUtils;
 import com.pm.cameraui.widget.TouchHandlerListener;
 
 public class MainActivity extends BaseActivity<MainPresenter> implements MainView, TouchHandlerListener {
@@ -29,6 +31,7 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainVie
     EditText edtLoginName;
     EditText edtLoginPswd;
     Button btnLogin;
+    CheckBox cbRemmenber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +58,7 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainVie
     public void initView() {
         edtLoginName = findViewById(R.id.edtLoginName);
         edtLoginPswd = findViewById(R.id.edtLoginPswd);
+        cbRemmenber = findViewById(R.id.cbRemmenber);
         btnLogin = findViewById(R.id.btnLogin);
         btnLogin.setFocusable(true);
         btnLogin.setOnClickListener(new View.OnClickListener() {
@@ -64,18 +68,30 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainVie
             }
         });
 
-        String userName = SPHelp.getInstance(getActivity()).getStringValue(SPHelp.SP_LOGIN_NAME);
-        String password = SPHelp.getInstance(getActivity()).getStringValue(SPHelp.SP_LOGIN_PASSWORD);
-        if ((!TextUtils.isEmpty(userName)) && (!TextUtils.isEmpty(password))) {
-            edtLoginName.setText(userName);
-            edtLoginPswd.setText(password);
-        }
+
 
         btnLogin.requestFocus();
 
+        boolean isRemmember = SPHelp.getInstance(getActivity()).getBooleanValue(SPHelp.SP_IS_REMMEMBER,true);
+        cbRemmenber.setChecked(isRemmember);
+
+
+        if(cbRemmenber.isChecked()){
+            String userName = SPHelp.getInstance(getActivity()).getStringValue(SPHelp.SP_LOGIN_NAME);
+            String password = SPHelp.getInstance(getActivity()).getStringValue(SPHelp.SP_LOGIN_PASSWORD);
+            if ((!TextUtils.isEmpty(userName)) && (!TextUtils.isEmpty(password))) {
+                edtLoginName.setText(userName);
+                edtLoginPswd.setText(password);
+            }
+        }
     }
 
     public void login() {
+        if(TextUtils.isEmpty(edtLoginPswd.getText())||TextUtils.isEmpty(edtLoginName.getText())){
+            ToastUtils.show(getActivity(),"请先输入账号和密码");
+            return;
+        }
+
         if(!presenter.isLoading){
             presenter.login(edtLoginName.getText().toString().trim(), edtLoginPswd.getText().toString().trim());
         }
@@ -86,6 +102,11 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainVie
 //        Toast.makeText(getApplication(), "登录成功！" + o.getUserId(), Toast.LENGTH_SHORT).show();
         Constants.userInfo = o;
         startActivity(CameraActivity.newIntent(MainActivity.this, CameraActivity.TYPE_VIDEO));
+
+        if(!cbRemmenber.isChecked()){
+            edtLoginName.setText("");
+            edtLoginPswd.setText("");
+        }
     }
 
 
@@ -116,10 +137,17 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainVie
                 edtLoginName.requestFocus();
                 edtLoginName.setSelection(edtLoginName.getText().length());
             } else if (DIR == TouchHandlerListener.DIR_DOWN) {
+                cbRemmenber.requestFocus();
+            }
+        } else if(cbRemmenber.isFocused()){
+            if (DIR == TouchHandlerListener.DIR_UP) {
+                edtLoginPswd.requestFocus();
+                edtLoginPswd.setSelection(edtLoginPswd.getText().length());
+            } else if (DIR == TouchHandlerListener.DIR_DOWN) {
                 btnLogin.requestFocus();
             }
         } else if (btnLogin.isFocused() && DIR == TouchHandlerListener.DIR_UP) {
-            edtLoginPswd.requestFocus();
+            cbRemmenber.requestFocus();
         }
     }
 
@@ -130,7 +158,15 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainVie
             showSoftInputFromWindow(getActivity(),edtLoginPswd);
         } else if (btnLogin.isFocused()) {
             btnLogin.performClick();
+        } else if(cbRemmenber.isFocused()){
+            clickedRemember();
         }
+    }
+
+    public void clickedRemember(){
+        boolean isChecked = cbRemmenber.isChecked();
+        cbRemmenber.setChecked(!isChecked);
+        SPHelp.getInstance(getActivity()).setBooleanValue(SPHelp.SP_IS_REMMEMBER,cbRemmenber.isChecked());
     }
 
 
