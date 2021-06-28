@@ -12,12 +12,13 @@ import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Size;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hjq.toast.ToastUtils;
 import com.obs.services.model.ProgressListener;
@@ -25,6 +26,8 @@ import com.obs.services.model.ProgressStatus;
 import com.pm.cameracore.DelegateCallback;
 import com.pm.cameracore.RecordDelegate;
 import com.pm.cameraui.base.BaseFragment;
+import com.pm.cameraui.base.MyGestureListener;
+import com.pm.cameraui.base.MyRightLeftListener;
 import com.pm.cameraui.bean.InspectRecord;
 import com.pm.cameraui.bean.Mark;
 import com.pm.cameraui.bean.RecordSave;
@@ -45,7 +48,6 @@ import com.pm.cameraui.widget.CameraController;
 import com.pm.cameraui.widget.MyVidoeController;
 import com.pm.cameraui.widget.ShareDialog;
 import com.pm.cameraui.widget.TopicSelectDialog;
-import com.pm.cameraui.widget.TouchHandlerListener;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -59,7 +61,7 @@ import java.util.TimerTask;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-public class VideoFragment extends BaseFragment<VideoPresenter> implements DelegateCallback, VideoView, TouchHandlerListener {
+public class VideoFragment extends BaseFragment<VideoPresenter> implements DelegateCallback, VideoView {
 
     private AutoFitTextureView mTextureView;
     private CameraController mController;
@@ -75,7 +77,6 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     private RelativeLayout rlLoading;
     private TextView tvProgress;
     private String strProgress;
-
     private boolean isFinishedTask = false;
 
 
@@ -212,7 +213,44 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
 
 
 
+        initGestureDetetor();
 
+    }
+
+    public void initGestureDetetor(){
+//        detector = new GestureDetector(this, new MyGestureListener(
+//                new MyRightLeftListener() {
+//                    @Override
+//                    public void onRight() {
+//                        slideFocusChange(MyGestureListener.DIR_RIGHT);
+//                    }
+//
+//                    @Override
+//                    public void onLeft() {
+//                        slideFocusChange(MyGestureListener.DIR_LEFT);
+//                    }
+//
+//                    @Override
+//                    public void onUp() {
+//                        // TODO Auto-generated method stub
+//                        slideFocusChange(MyGestureListener.DIR_UP);
+//                    }
+//                    @Override
+//                    public void onDown() {
+//                        // TODO Auto-generated method stub
+//                        slideFocusChange(MyGestureListener.DIR_DOWN);
+//                    }
+//
+//                    @Override
+//                    public void onSlide() {
+//
+//                    }
+//
+//                    @Override
+//                    public void onSingleTapUp() {
+//                      clicked();
+//                    }
+//                }));
     }
 
     //后台上传本地数据
@@ -841,52 +879,6 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         });
     }
 
-
-    @Override
-    public void updateCursorPos(int cursorPos) {
-
-    }
-
-    @Override
-    public void doScrollX(int dx) {
-
-    }
-
-    @Override
-    public void doFling(int speedX) {
-
-    }
-
-    @Override
-    public void doTouchupNoMove() {
-
-    }
-
-    @Override
-    public void doTouchUp() {
-
-    }
-
-    @Override
-    public void slideDown() {
-        slideFocusChange(TouchHandlerListener.DIR_DOWN);
-    }
-
-    @Override
-    public void slideUp() {
-        slideFocusChange(TouchHandlerListener.DIR_UP);
-    }
-
-    @Override
-    public void slideLeft() {
-        slideFocusChange(TouchHandlerListener.DIR_LEFT);
-    }
-
-    @Override
-    public void slideRight() {
-        slideFocusChange(TouchHandlerListener.DIR_RIGHT);
-    }
-
     public void slideFocusChange(int DIR) {
         myVideoController.slideFocusChange(DIR);
     }
@@ -898,4 +890,10 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     public void showOrHideControl(boolean isShow){
         Log.d("RAMBO",isShow?"showControler":"hideControler");
     }
+
+
+    public void slideDown(){myVideoController.slideFocusChange(MyGestureListener.DIR_DOWN);}
+    public void slideUp(){myVideoController.slideFocusChange(MyGestureListener.DIR_UP);}
+    public void slideLeft(){myVideoController.slideFocusChange(MyGestureListener.DIR_LEFT);}
+    public void slideRight(){myVideoController.slideFocusChange(MyGestureListener.DIR_RIGHT);}
 }

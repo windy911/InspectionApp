@@ -14,6 +14,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.pm.cameraui.R;
+import com.pm.cameraui.base.MyGestureListener;
 import com.pm.cameraui.utils.TimeUtil;
 
 public class MyVidoeController extends RelativeLayout {
@@ -219,7 +220,7 @@ public class MyVidoeController extends RelativeLayout {
 
         Log.d("RAMBO", "MyVideoController SlideChange = " + DIR);
 
-        if (DIR == TouchHandlerListener.DIR_UP && btnStart.getVisibility() == View.GONE && llRecording.getVisibility()==View.GONE) {
+        if (DIR == MyGestureListener.DIR_UP && btnStart.getVisibility() == View.GONE && llRecording.getVisibility()==View.GONE) {
             showOrHideControl(true);
             facousPauseOrContinue();
             return;
@@ -227,13 +228,13 @@ public class MyVidoeController extends RelativeLayout {
 
 
         if (btnStart.isFocused()) {
-            if (DIR == TouchHandlerListener.DIR_UP || DIR == TouchHandlerListener.DIR_LEFT) {
+            if (DIR == MyGestureListener.DIR_UP || DIR == MyGestureListener.DIR_LEFT) {
                 btnExitApp.requestFocus();
-            } else if (DIR == TouchHandlerListener.DIR_RIGHT) {
+            } else if (DIR == MyGestureListener.DIR_RIGHT) {
                 btnSwitchCamera.requestFocus();
             }
         } else if (btnExitApp.isFocused()) {
-            if (DIR == TouchHandlerListener.DIR_RIGHT) {
+            if (DIR == MyGestureListener.DIR_RIGHT) {
                 if (btnSwitchCamera.getVisibility() == View.VISIBLE) {
                     btnSwitchCamera.requestFocus();
                 } else {
@@ -243,7 +244,7 @@ public class MyVidoeController extends RelativeLayout {
                         btnContinue.requestFocus();
                     }
                 }
-            } else if (DIR == TouchHandlerListener.DIR_DOWN) {
+            } else if (DIR == MyGestureListener.DIR_DOWN) {
                 if (btnStart.getVisibility() == VISIBLE) {
                     btnStart.requestFocus();
                 } else {
@@ -255,54 +256,54 @@ public class MyVidoeController extends RelativeLayout {
                 }
             }
         } else if (btnSwitchCamera.isFocused()) {
-            if (DIR == TouchHandlerListener.DIR_LEFT) {
+            if (DIR == MyGestureListener.DIR_LEFT) {
                 btnExitApp.requestFocus();
-            } else if (DIR == TouchHandlerListener.DIR_DOWN) {
+            } else if (DIR == MyGestureListener.DIR_DOWN) {
                 btnStart.requestFocus();
             }
         } else if (btnPause.isFocused()) {
-            if (DIR == TouchHandlerListener.DIR_LEFT) {
+            if (DIR == MyGestureListener.DIR_LEFT) {
                 btnExitApp.requestFocus();
-            } else if (DIR == TouchHandlerListener.DIR_UP) {
+            } else if (DIR == MyGestureListener.DIR_UP) {
 //                showOrHideControl(true);
-            } else if (DIR == TouchHandlerListener.DIR_RIGHT) {
+            } else if (DIR == MyGestureListener.DIR_RIGHT) {
                 btnStop.requestFocus();
-            } else if (DIR == TouchHandlerListener.DIR_DOWN) {
+            } else if (DIR == MyGestureListener.DIR_DOWN) {
                 showOrHideControl(false);
             }
         } else if (btnContinue.isFocused()) {
-            if (DIR == TouchHandlerListener.DIR_LEFT) {
+            if (DIR == MyGestureListener.DIR_LEFT) {
                 btnExitApp.requestFocus();
-            } else if (DIR == TouchHandlerListener.DIR_UP) {
+            } else if (DIR == MyGestureListener.DIR_UP) {
 //                showOrHideControl(true);
-            } else if (DIR == TouchHandlerListener.DIR_RIGHT) {
+            } else if (DIR == MyGestureListener.DIR_RIGHT) {
                 btnStop.requestFocus();
-            } else if (DIR == TouchHandlerListener.DIR_DOWN) {
+            } else if (DIR == MyGestureListener.DIR_DOWN) {
                 showOrHideControl(false);
             }
         } else if (btnStop.isFocused()) {
-            if (DIR == TouchHandlerListener.DIR_LEFT) {
+            if (DIR == MyGestureListener.DIR_LEFT) {
                 if (llbtnContinue.getVisibility() == VISIBLE) {
                     btnContinue.requestFocus();
                 } else if (llbtnPause.getVisibility() == VISIBLE) {
                     btnPause.requestFocus();
                 }
-            } else if (DIR == TouchHandlerListener.DIR_RIGHT) {
+            } else if (DIR == MyGestureListener.DIR_RIGHT) {
                 btnSwitchCamera2.requestFocus();
-            } else if (DIR == TouchHandlerListener.DIR_UP) {
+            } else if (DIR == MyGestureListener.DIR_UP) {
 //                btnExitApp.requestFocus();
 //                showOrHideControl(true);
-            } else if (DIR == TouchHandlerListener.DIR_DOWN) {
+            } else if (DIR == MyGestureListener.DIR_DOWN) {
                 showOrHideControl(false);
             }
         } else if (btnSwitchCamera2.isFocused()) {
-            if (DIR == TouchHandlerListener.DIR_LEFT) {
+            if (DIR == MyGestureListener.DIR_LEFT) {
                 Log.d("RAMBO", "当前镜头2，点击左边按钮了");
                 btnStop.requestFocus();
-            } else if (DIR == TouchHandlerListener.DIR_UP) {
+            } else if (DIR == MyGestureListener.DIR_UP) {
 //                btnExitApp.requestFocus();
 //                showOrHideControl(true);
-            } else if (DIR == TouchHandlerListener.DIR_DOWN) {
+            } else if (DIR == MyGestureListener.DIR_DOWN) {
                 showOrHideControl(false);
             }
         }
