@@ -136,7 +136,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         myVideoController.setControllerCallback(new CameraController.ControllerCallback() {
             @Override
             public void takePicture() {
-                markRecord();
+                markRecord(true);
             }
 
             @Override
@@ -654,8 +654,10 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
 //    }
 
     //添加标签，首先拍照等回调
-    public void markRecord() {
-        ToastUtils.show("标记处理中...");
+    public void markRecord(boolean isShowMark) {
+        if(isShowMark){
+            ToastUtils.show("标记处理中...");
+        }
         mRecordDelegate.takePicture();
     }
 
@@ -668,8 +670,10 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
 
     @Override
     public void addMarkRecord(Mark mark) {
-        Log.d("RAMBO", "新增Mark成功：" + mark.toString());
-        ToastUtils.show("标记成功");
+        myVideoController.showMarkSuccess();
+        Message msg = new Message();
+        msg.what = HANDLER_HIDE_MARK_SUCCESS;
+        uiHandler.sendMessageDelayed(msg, 1000);
         //最后提交的时候，显示Mark数 +1
         inspectRecord.setLabels(inspectRecord.getLabels() + 1);
         markList.add(mark);
@@ -679,7 +683,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     //截图按键 短按一下 500ms 内,拍照 Mark
     public void onMarkShortClicked() {
         Log.d("RAMBO", "Voice单击事件触发拍照功能！");
-        markRecord();
+        markRecord(true);
         isForVoiceMark = false;
     }
 
@@ -690,7 +694,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         Log.d("RAMBO", "Voice长按开始");
         audioStartTime = periodTime / 1000;
         audioStartTimeLong = System.currentTimeMillis();
-        markRecord();
+        markRecord(false);
         isForVoiceMark = true;
         audioDownTime = System.currentTimeMillis();
     }
@@ -830,6 +834,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     public static final int HANDLER_UPLOAD_BACKGROUD = 4;
     public static final int HANDLER_HIDE_BG_ACTION = 5;
     public static final int HANDLER_SHOW_BG_ACTION = 6;
+    public static final int HANDLER_HIDE_MARK_SUCCESS = 7;
 
     private Handler uiHandler = new Handler() {
         public void handleMessage(Message msg) {
@@ -850,6 +855,8 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
                 showLoading(false);
             }else if (msg.what == HANDLER_SHOW_BG_ACTION) {
                 myVideoController.showBackgroundAction(true);
+            }else if(msg.what == HANDLER_HIDE_MARK_SUCCESS){
+                myVideoController.hideMarkSuccess();
             }
         }
     };

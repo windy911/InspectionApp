@@ -26,6 +26,7 @@ public class MyVidoeController extends RelativeLayout {
     TextView tvRedDot, tvTimer;
     ProgressBar voiceProgress;
     LinearLayout llVoiceMark;
+    LinearLayout llMarkSuccess;
     boolean isTaskRecording = false;
 
     public MyVidoeController(Context context) {
@@ -59,6 +60,7 @@ public class MyVidoeController extends RelativeLayout {
         tvTimer = findViewById(R.id.tvTimer);
         tvRedDot.setVisibility(View.GONE);
         llVoiceMark = findViewById(R.id.llVoiceMark);
+        llMarkSuccess = findViewById(R.id.llMarkSuccess);
         voiceProgress = findViewById(R.id.voiceProgress);
         btnExitApp = findViewById(R.id.btnExitApp);
         btnStart.setOnClickListener(view -> {
@@ -213,6 +215,15 @@ public class MyVidoeController extends RelativeLayout {
         } else if (llbtnPause.getVisibility() == View.VISIBLE) {
             btnPause.requestFocus();
         }
+    }
+
+    public void showMarkSuccess(){
+        llMarkSuccess.setVisibility(View.VISIBLE);
+
+    }
+
+    public void hideMarkSuccess(){
+        llMarkSuccess.setVisibility(View.GONE);
     }
 
     public void slideFocusChange(int DIR) {
