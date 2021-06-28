@@ -463,7 +463,16 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     private String createVideoFilePath(Context context) {
         final File dir = context.getExternalFilesDir(Environment.DIRECTORY_MOVIES);
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSSS", Locale.getDefault());
-        String dateStr = dateFormat.format(new Date());
+        String dateStr = "";
+
+        if(Constants.CURRENT_TOPIC != null){
+            dateStr+=Constants.CURRENT_TOPIC.getName();
+        }
+        if(Constants.userInfo!=null){
+            dateStr+="_"+Constants.userInfo.getUserName();
+        }
+        dateStr +="_"+dateFormat.format(new Date());
+
         return (dir == null ? "" : (dir.getAbsolutePath() + "/")) + dateStr + ".mp4";
     }
 
