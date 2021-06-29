@@ -10,7 +10,7 @@ public class MyGestureListener implements GestureDetector.OnGestureListener {
     // 水平方向移动的距离，绝对值
     private float distanceX;
     // 移动距离大于下面的值时，才触发滑动屏幕的监听
-    private float distance = 100;
+    private float distance = 50;
 
     public static final int DIR_LEFT = 0;
     public static final int DIR_RIGHT = 1;
@@ -91,9 +91,9 @@ public class MyGestureListener implements GestureDetector.OnGestureListener {
         distanceY = Math.abs(endtY - startY);
         // 首先判断是水平方向移动还是垂直方向移动
 
-//        if (distanceX>300&&distanceY>500) {
-//            listener.onSlide();
-//        }
+        if (distanceX>300&&distanceY>500) {
+            listener.onSlide();
+        }
 
         if (distanceX > distanceY) {
             // 说明水平反向移动的距离远，就认定为水平移动

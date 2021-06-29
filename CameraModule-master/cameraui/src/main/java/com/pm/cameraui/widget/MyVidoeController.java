@@ -316,8 +316,12 @@ public class MyVidoeController extends RelativeLayout {
 //                showOrHideControl(true);
             } else if (DIR == MyGestureListener.DIR_DOWN) {
                 showOrHideControl(false);
+            } else if(DIR == MyGestureListener.DIR_RIGHT){
+
             }
         }
+
+
     }
 
     public boolean isStarted() {

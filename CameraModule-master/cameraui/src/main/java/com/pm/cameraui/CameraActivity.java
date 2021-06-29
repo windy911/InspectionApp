@@ -223,11 +223,6 @@ public class CameraActivity extends AppCompatActivity  {
     }
 
 
-    public void slideFocusChange(int DIR) {
-        Log.d("RAMBO", "DIR = " + DIR);
-    }
-
-
     public long lastClickedTime = System.currentTimeMillis();
 
     public void clicked() {

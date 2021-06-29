@@ -158,7 +158,11 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
             @Override
             public void recordPause() {
                 //真正退出，不及时预览
-                pauseRecording();
+                try{
+                    pauseRecording();
+                }catch (Exception e){
+
+                }
             }
 
             @Override

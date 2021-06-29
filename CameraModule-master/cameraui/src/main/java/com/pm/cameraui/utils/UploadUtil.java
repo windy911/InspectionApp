@@ -112,29 +112,35 @@ public class UploadUtil {
             epVideos.add(new EpVideo(url));
         }
 
-        EpEditor.mergeByLc(context, epVideos, new EpEditor.OutputOption(outFile), new OnEditorListener() {
-            @Override
-            public void onSuccess() {
-                Log.e(TAG, "合并成功 输出路径：" + outFile);
-                for (String path : videoPath) {
-                    Log.e(TAG, "合并成功清理删除临时文件：" + path);
-                    FileUtils.deleteFile(path);
-                }
-                if (onMergeSuccessListener != null) {
-                    onMergeSuccessListener.onMergeSuccess(outFile);
-                }
-            }
 
-            @Override
-            public void onFailure() {
-                Log.e(TAG, "合并失败");
-            }
+        try{
+            EpEditor.mergeByLc(context, epVideos, new EpEditor.OutputOption(outFile), new OnEditorListener() {
+                @Override
+                public void onSuccess() {
+                    Log.e(TAG, "合并成功 输出路径：" + outFile);
+                    for (String path : videoPath) {
+                        Log.e(TAG, "合并成功清理删除临时文件：" + path);
+                        FileUtils.deleteFile(path);
+                    }
+                    if (onMergeSuccessListener != null) {
+                        onMergeSuccessListener.onMergeSuccess(outFile);
+                    }
+                }
 
-            @Override
-            public void onProgress(float progress) {
-                Log.i(TAG, "合并中，进度：" + progress);
-            }
-        });
+                @Override
+                public void onFailure() {
+                    Log.e(TAG, "合并失败");
+                }
+
+                @Override
+                public void onProgress(float progress) {
+                    Log.i(TAG, "合并中，进度：" + progress);
+                }
+            });
+        }catch (Exception e){
+
+        }
+
     }
 
     public interface OnMergeSuccessListener {
