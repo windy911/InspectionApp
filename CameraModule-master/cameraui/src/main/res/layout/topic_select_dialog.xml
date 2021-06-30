@@ -9,7 +9,8 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center_horizontal"
-        android:background="#33FFFFFF" >
+        android:background="#000000" >
+
         <TextView
             android:id="@+id/tvTitle"
             android:textColor="@color/white"
@@ -21,7 +22,6 @@
             android:textSize="20sp"
             android:layout_centerHorizontal="true"
             android:text="@string/select_topic"/>
-
 
         <RelativeLayout android:layout_width="match_parent"
             android:layout_centerInParent="true"
@@ -75,9 +75,8 @@
             android:focusable="true"
             android:gravity="center"
             android:focusableInTouchMode="true"
-            android:textSize="20sp"
+            android:textSize="16sp"
             android:layout_height="48dp"/>
-
         <TextView
             android:id="@+id/tvHide"
             android:text="@string/topic_select_confirm"

@@ -27,6 +27,7 @@ public class MyVidoeController extends RelativeLayout {
     ProgressBar voiceProgress;
     LinearLayout llVoiceMark;
     LinearLayout llMarkSuccess;
+    LinearLayout llImageMarking;
     boolean isTaskRecording = false;
 
     public MyVidoeController(Context context) {
@@ -61,6 +62,7 @@ public class MyVidoeController extends RelativeLayout {
         tvRedDot.setVisibility(View.GONE);
         llVoiceMark = findViewById(R.id.llVoiceMark);
         llMarkSuccess = findViewById(R.id.llMarkSuccess);
+        llImageMarking = findViewById(R.id.llImageMarking);
         voiceProgress = findViewById(R.id.voiceProgress);
         btnExitApp = findViewById(R.id.btnExitApp);
         btnStart.setOnClickListener(view -> {
@@ -111,6 +113,13 @@ public class MyVidoeController extends RelativeLayout {
         btnExitApp.setOnClickListener(view -> {
             if (mCallback != null) {
                 mCallback.onExitApp();
+            }
+        });
+
+        btnStart.setOnFocusChangeListener(new OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                btnStart.setAlpha(b?1.0f:0.3f);
             }
         });
 
@@ -188,6 +197,7 @@ public class MyVidoeController extends RelativeLayout {
     public void showBackgroundAction(boolean isShow) {
         btnSwitchCamera.setVisibility(isShow ? View.VISIBLE : View.GONE);
         btnExitApp.setVisibility(isShow ? View.VISIBLE : View.GONE);
+        btnStart.setVisibility(isShow?View.VISIBLE:View.GONE);
     }
 
 
@@ -217,9 +227,15 @@ public class MyVidoeController extends RelativeLayout {
         }
     }
 
+    public void showImageMarking(){
+        llImageMarking.setVisibility(View.VISIBLE);
+    }
+    public void hideImageMarkding(){
+        llImageMarking.setVisibility(View.GONE);
+    }
+
     public void showMarkSuccess(){
         llMarkSuccess.setVisibility(View.VISIBLE);
-
     }
 
     public void hideMarkSuccess(){

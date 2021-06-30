@@ -184,16 +184,16 @@
             android:layout_width="wrap_content"
             android:text="正在说话中..."
             android:textSize="16sp"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:textStyle="bold"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="2dp"
+            android:textStyle="normal"
             android:textColor="@color/green"
             android:layout_height="wrap_content"/>
         <ProgressBar android:id="@+id/voiceProgress"
             android:layout_width="100dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="4dp"
             android:progressDrawable="@drawable/my_progressbar"
             style="@android:style/Widget.ProgressBar.Horizontal"
             android:layout_height="4dp"/>
@@ -222,7 +222,32 @@
             android:paddingRight="8dp"
             android:paddingTop="8dp"
             android:paddingBottom="8dp"
-            android:textStyle="bold"
+            android:textStyle="normal"
+            android:textColor="@color/green"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <LinearLayout android:id="@+id/llImageMarking"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/llTimer"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/bg_round_voice"
+        android:gravity="center"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:visibility="gone"
+        android:layout_centerHorizontal="true"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:text="图片标记中..."
+            android:textSize="16sp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:textStyle="normal"
             android:textColor="@color/green"
             android:layout_height="wrap_content"/>
     </LinearLayout>

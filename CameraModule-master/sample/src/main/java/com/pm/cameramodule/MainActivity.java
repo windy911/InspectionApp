@@ -72,6 +72,13 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainVie
             }
         });
 
+        btnLogin.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                btnLogin.setAlpha(b?1.0f:0.3f);
+            }
+        });
+
 
         btnLogin.requestFocus();
 

@@ -118,7 +118,15 @@ public class TopicSelectDialog extends DialogFragment implements View.OnClickLis
             clearIndexSign();
         }
 
+
+        confirmButton.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                confirmButton.setAlpha(b?1.0f:0.3f);
+            }
+        });
         confirmButton.requestFocus();
+
 
         btnExit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override

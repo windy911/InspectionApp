@@ -131,7 +131,7 @@ public class VideoPresenter extends BasePresenter<VideoView> {
             }
             @Override
             public void onError(String msg) {
-                baseView.showError(msg);
+                baseView.addMarkRecord(null);
             }
         });
     }

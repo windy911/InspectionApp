@@ -660,7 +660,10 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     //添加标签，首先拍照等回调
     public void markRecord(boolean isShowMark) {
         if(isShowMark){
-            ToastUtils.show("标记处理中...");
+            myVideoController.showImageMarking();
+            Message msg = new Message();
+            msg.what = HANDLER_HIDE_IMAGE_MARKDING;
+            uiHandler.sendMessageDelayed(msg, 1000);
         }
         mRecordDelegate.takePicture();
     }
@@ -839,6 +842,8 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     public static final int HANDLER_HIDE_BG_ACTION = 5;
     public static final int HANDLER_SHOW_BG_ACTION = 6;
     public static final int HANDLER_HIDE_MARK_SUCCESS = 7;
+    public static final int HANDLER_HIDE_IMAGE_MARKDING = 8;
+
 
     private Handler uiHandler = new Handler() {
         public void handleMessage(Message msg) {
@@ -861,6 +866,8 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
                 myVideoController.showBackgroundAction(true);
             }else if(msg.what == HANDLER_HIDE_MARK_SUCCESS){
                 myVideoController.hideMarkSuccess();
+            }else if(msg.what == HANDLER_HIDE_IMAGE_MARKDING){
+                myVideoController.hideImageMarkding();
             }
         }
     };
