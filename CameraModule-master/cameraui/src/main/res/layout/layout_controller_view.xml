@@ -46,7 +46,7 @@
                 android:layout_height="48dp"
                 android:background="@drawable/selector_pause" />
             <TextView android:layout_width="wrap_content"
-                android:textSize="11sp"
+                android:textSize="10sp"
                 android:textColor="@color/white"
                 android:text="暂停"
                 android:layout_height="wrap_content"/>
@@ -68,7 +68,7 @@
 
                 android:background="@drawable/selector_continue" />
             <TextView android:layout_width="wrap_content"
-                android:textSize="11sp"
+                android:textSize="10sp"
                 android:textColor="@color/white"
                 android:text="继续"
                 android:layout_height="wrap_content"/>
@@ -90,7 +90,7 @@
 
                 android:background="@drawable/selector_stop" />
             <TextView android:layout_width="wrap_content"
-                android:textSize="11sp"
+                android:textSize="10sp"
                 android:textColor="@color/white"
                 android:text="结束"
                 android:layout_height="wrap_content"/>
@@ -111,7 +111,7 @@
                 android:visibility="visible"
                 android:background="@drawable/icon_camera_switch" />
             <TextView android:layout_width="wrap_content"
-                android:textSize="11sp"
+                android:textSize="10sp"
                 android:textColor="@color/white"
                 android:text="切换摄像头"
                 android:layout_height="wrap_content"/>
