@@ -34,6 +34,8 @@ public class CameraActivity extends AppCompatActivity  {
     public static CameraActivity instance = null;
     GestureDetector detector;
 
+    public static String longitude,latitude;
+
     public static Intent newIntent(Context context, String cameraType) {
         Intent intent = new Intent(context, CameraActivity.class);
         intent.putExtra(CAMERA_TYPE_INTENT_NAME, cameraType);
@@ -87,6 +89,9 @@ public class CameraActivity extends AppCompatActivity  {
                         clicked();
                     }
                 }));
+
+        longitude = "";
+        latitude = "";
     }
 
     @Override
@@ -160,7 +165,8 @@ public class CameraActivity extends AppCompatActivity  {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (KeyEvent.KEYCODE_ALL_APPS == keyCode) {
+//        if (KeyEvent.KEYCODE_ALL_APPS == keyCode) {
+        if (KeyEvent.KEYCODE_VOLUME_DOWN == keyCode) {
             ((VideoFragment) fragment).onVoiceKeyDown();
         }
         return super.onKeyDown(keyCode, event);
@@ -169,7 +175,8 @@ public class CameraActivity extends AppCompatActivity  {
 
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
-        if (KeyEvent.KEYCODE_ALL_APPS == keyCode) {
+//        if (KeyEvent.KEYCODE_ALL_APPS == keyCode) {
+        if (KeyEvent.KEYCODE_VOLUME_DOWN == keyCode) {
             ((VideoFragment) fragment).onVoiceKeyUp();
         }
         return super.onKeyUp(keyCode, event);
@@ -208,6 +215,8 @@ public class CameraActivity extends AppCompatActivity  {
                         //可在其中解析amapLocation获取相应内容。
                         Log.e("RAMBO", "size = " + LocationUtil.locationList.size() + " 经度:" + amapLocation.getLatitude() + ", 维度:" + amapLocation.getLongitude());
 //                        Toast.makeText(CameraActivity.this, " 经度:" + amapLocation.getLatitude() + ", 维度:" + amapLocation.getLongitude(),Toast.LENGTH_SHORT).show();
+                        longitude = String.valueOf(amapLocation.getLongitude());
+                        latitude = String.valueOf(amapLocation.getLatitude());
                     }
                 }
             }

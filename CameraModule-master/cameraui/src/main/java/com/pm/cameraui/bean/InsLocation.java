@@ -9,11 +9,11 @@ public class InsLocation {
      */
     private long timeStamp;
     /**
-     * 经度
+     * 纬度
      */
     private String latitude;
     /**
-     * 纬度l
+     * 经度
      */
     private String longitude;
     /**

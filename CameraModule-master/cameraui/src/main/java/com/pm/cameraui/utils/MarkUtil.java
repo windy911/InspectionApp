@@ -15,7 +15,7 @@ import java.util.concurrent.Executors;
 
 public class MarkUtil {
 
-    public static Mark singleImageMark(InspectRecord inspectRecord, String imageLocalFile, String imageRemoteUrl, long recordTimeLong) {
+    public static Mark singleImageMark(InspectRecord inspectRecord, String imageLocalFile, String imageRemoteUrl, long recordTimeLong,String longitude,String latitude) {
         if (imageLocalFile == null || inspectRecord == null) return null;
         Mark mark = new Mark();
         mark.setMarkType(0);//1--图片标记
@@ -28,10 +28,12 @@ public class MarkUtil {
         mark.setMarkedObjId(inspectRecord.getId());
         mark.setPictureLocalPath(imageLocalFile);
         mark.setTagPicUrl(imageRemoteUrl);
+        mark.setLongitude(longitude);
+        mark.setLatitude(latitude);
         return mark;
     }
 
-    public static Mark withAudioMark(InspectRecord inspectRecord, String imageLocalFile, String imageRemoteUrl, long audioStartTime, long audioEndTime, long startTimestamp, long endTimestamp) {
+    public static Mark withAudioMark(InspectRecord inspectRecord, String imageLocalFile, String imageRemoteUrl, long audioStartTime, long audioEndTime, long startTimestamp, long endTimestamp,String longitude,String latitude) {
         if (imageLocalFile == null || inspectRecord == null) return null;
         Mark mark = new Mark();
         mark.setMarkType(1);//1--图片+音频标记
@@ -43,6 +45,8 @@ public class MarkUtil {
         mark.setStartTimeLong(audioStartTime);
         mark.setEndTimeLong(audioEndTime);
         mark.setDuration(audioEndTime - audioStartTime);
+        mark.setLongitude(longitude);
+        mark.setLatitude(latitude);
         return mark;
     }
 

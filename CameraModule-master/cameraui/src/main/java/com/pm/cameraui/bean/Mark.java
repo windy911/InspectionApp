@@ -46,6 +46,10 @@ public class Mark {
     private String updateDate;
     private String vedioLocalPath;
     private String vedioUrl;
+
+    private String longitude;//经度
+    private String latitude;//纬度
+
     /**
      * 标记类型。0--单图片标记，1--图片+音频标记
      */
@@ -56,7 +60,7 @@ public class Mark {
                 Long markedObjId, String name, String pictureLocalPath, Integer rank,
                 String startTime, Long startTimeLong, String tagPicUrl, Long updateBy,
                 String updateDate, String vedioLocalPath, String vedioUrl,
-                int markType) {
+                int markType,String longitude,String latitude) {
         this.audioText = audioText;
         this.audioUrl = audioUrl;
         this.createBy = createBy;
@@ -77,6 +81,8 @@ public class Mark {
         this.vedioLocalPath = vedioLocalPath;
         this.vedioUrl = vedioUrl;
         this.markType = markType;
+        this.longitude = longitude;
+        this.latitude = latitude;
     }
 //    @Generated(hash = 1181118646)
     public Mark() {
@@ -202,6 +208,11 @@ public class Mark {
         this.markType = markType;
     }
 
+    public String getLongitude() { return longitude; }
+    public void setLongitude(String longitude) { this.longitude = longitude; }
+    public String getLatitude() {  return latitude; }
+    public void setLatitude(String latitude) { this.latitude = latitude; }
+
     @Override
     public String toString() {
         return "Mark{" +
@@ -225,6 +236,8 @@ public class Mark {
                 ", vedioLocalPath='" + vedioLocalPath + '\'' +
                 ", vedioUrl='" + vedioUrl + '\'' +
                 ", markType=" + markType +
+                ", longitude=" + longitude +
+                ", latitude=" + latitude +
                 '}';
     }
 }

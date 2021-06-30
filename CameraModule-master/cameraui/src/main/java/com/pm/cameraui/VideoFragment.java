@@ -666,7 +666,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     }
 
     public void updateRecord(String localPath, String imgUrl) {
-        Mark mark = MarkUtil.singleImageMark(inspectRecord, localPath, imgUrl, periodTime);
+        Mark mark = MarkUtil.singleImageMark(inspectRecord, localPath, imgUrl, periodTime,CameraActivity.longitude,CameraActivity.latitude);
         if (mark != null) {
             presenter.addMarkRecord(mark);
         }
@@ -789,7 +789,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         audioEndTime = periodTime / 1000;
         audioEndTimeLong = System.currentTimeMillis();
         Mark mark = MarkUtil.withAudioMark(inspectRecord, audioMarkImagePath, audioMarkImageURL,
-                audioStartTime, audioEndTime, audioStartTimeLong, audioEndTimeLong);
+                audioStartTime, audioEndTime, audioStartTimeLong, audioEndTimeLong,CameraActivity.longitude,CameraActivity.latitude);
         if (mark != null) {
             presenter.addMarkRecord(mark);
         }
