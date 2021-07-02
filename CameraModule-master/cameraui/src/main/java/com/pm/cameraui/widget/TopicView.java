@@ -56,12 +56,18 @@ public class TopicView extends RelativeLayout {
     public void setSelected(boolean selected){
         tvTopic.setSelected(selected);
         this.isSelected = selected;
+        if(selected){tvTopic.setTextColor(getContext().getColor(R.color.white));}
         tvTopic.setBackground(getContext().getDrawable(selected?R.drawable.shape_round_rect_blue:R.drawable.shape_round_rect_white));
+    }
+
+    public void setTextColorWhite(){
+        tvTopic.setTextColor(getContext().getColor(R.color.white));
     }
 
     public void setSelected2(boolean selected){
         tvTopic.setSelected(selected);
         this.isSelected = selected;
+        if(selected){tvTopic.setTextColor(getContext().getColor(R.color.color_blue));}
         tvTopic.setBackground(getContext().getDrawable(selected?R.drawable.shape_round_rect_blue2:R.drawable.shape_round_rect_white));
     }
 

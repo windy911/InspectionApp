@@ -201,6 +201,7 @@ public class TopicSelectDialog extends DialogFragment implements View.OnClickLis
         selectTopic = topicList.get(index);
         for (int i = 0; i < topicViews.size(); i++) {
             topicViews.get(i).setSelected(index == i);
+            topicViews.get(i).setTextColorWhite();
             if (index == i) {
                 //计算屏幕的宽度
                 WindowManager wm1 = getActivity().getWindowManager();

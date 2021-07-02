@@ -10,118 +10,122 @@
     <Button
         android:id="@+id/btnStart"
         android:layout_width="120dp"
-        android:layout_height="48dp"
+        android:layout_height="40dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="60dp"
+        android:layout_marginBottom="40dp"
         android:text="开始"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:textSize="18sp"
         android:textStyle="bold"
         android:textColor="#FFFFFF"
-        android:background="@drawable/selector_button2" />
+        android:foreground="?android:attr/selectableItemBackground"
+        android:background="@drawable/shape_round_rect_blue4" />
+
+ <LinearLayout android:layout_width="match_parent"
+     android:layout_alignParentBottom="true"
+     android:gravity="center"
+     android:background="@drawable/bg_btn_bottom"
+     android:id="@+id/llRecording"
+     android:visibility="gone"
+     android:layout_height="128dp">
+
+     <LinearLayout android:layout_width="wrap_content"
+         android:layout_alignParentBottom="true"
+         android:layout_centerHorizontal="true"
+         android:padding="16dp"
+
+         android:layout_height="wrap_content">
+
+         <LinearLayout android:layout_width="wrap_content"
+             android:orientation="vertical"
+             android:id="@+id/llbtnPause"
+             android:gravity="center_horizontal"
+             android:layout_height="wrap_content">
+             <com.pm.cameraui.widget.MyButton
+                 android:id="@+id/btnPause"
+                 android:focusable="true"
+                 android:focusableInTouchMode="true"
+                 android:layout_width="48dp"
+                 android:layout_height="48dp"
+                 android:background="@drawable/selector_pause" />
+             <TextView android:layout_width="wrap_content"
+                 android:textSize="10sp"
+                 android:textColor="@color/white"
+                 android:text="暂停"
+                 android:layout_height="wrap_content"/>
+         </LinearLayout>
 
 
-<!--    android:background="@drawable/bg_round_4_transparent2"-->
-    <LinearLayout android:layout_width="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="48dp"
-        android:padding="16dp"
-        android:id="@+id/llRecording"
-        android:visibility="gone"
-        android:layout_height="wrap_content">
+         <LinearLayout android:layout_width="wrap_content"
+             android:orientation="vertical"
+             android:gravity="center_horizontal"
+             android:id="@+id/llbtnContinue"
+             android:visibility="gone"
+             android:layout_height="wrap_content">
+             <com.pm.cameraui.widget.MyButton
+                 android:id="@+id/btnContinue"
+                 android:focusable="true"
+                 android:focusableInTouchMode="true"
+                 android:layout_width="48dp"
+                 android:layout_height="48dp"
 
-        <LinearLayout android:layout_width="wrap_content"
-            android:orientation="vertical"
-            android:id="@+id/llbtnPause"
-            android:gravity="center_horizontal"
-            android:layout_height="wrap_content">
-            <com.pm.cameraui.widget.MyButton
-                android:id="@+id/btnPause"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="@drawable/selector_pause" />
-            <TextView android:layout_width="wrap_content"
-                android:textSize="10sp"
-                android:textColor="@color/white"
-                android:text="暂停"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
+                 android:background="@drawable/selector_continue" />
+             <TextView android:layout_width="wrap_content"
+                 android:textSize="10sp"
+                 android:textColor="@color/white"
+                 android:text="继续"
+                 android:layout_height="wrap_content"/>
+         </LinearLayout>
 
 
-        <LinearLayout android:layout_width="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_horizontal"
-            android:id="@+id/llbtnContinue"
-            android:visibility="gone"
-            android:layout_height="wrap_content">
-            <com.pm.cameraui.widget.MyButton
-                android:id="@+id/btnContinue"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+         <LinearLayout android:layout_width="wrap_content"
+             android:orientation="vertical"
+             android:layout_marginLeft="16dp"
+             android:gravity="center_horizontal"
+             android:layout_height="wrap_content">
 
-                android:background="@drawable/selector_continue" />
-            <TextView android:layout_width="wrap_content"
-                android:textSize="10sp"
-                android:textColor="@color/white"
-                android:text="继续"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
+             <com.pm.cameraui.widget.MyButton
+                 android:id="@+id/btnStop"
+                 android:focusable="true"
+                 android:focusableInTouchMode="true"
+                 android:layout_width="48dp"
+                 android:layout_height="48dp"
 
-
-        <LinearLayout android:layout_width="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginLeft="16dp"
-            android:gravity="center_horizontal"
-            android:layout_height="wrap_content">
-
-            <com.pm.cameraui.widget.MyButton
-                android:id="@+id/btnStop"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-
-                android:background="@drawable/selector_stop" />
-            <TextView android:layout_width="wrap_content"
-                android:textSize="10sp"
-                android:textColor="@color/white"
-                android:text="结束"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
+                 android:background="@drawable/selector_stop" />
+             <TextView android:layout_width="wrap_content"
+                 android:textSize="10sp"
+                 android:textColor="@color/white"
+                 android:text="结束"
+                 android:layout_height="wrap_content"/>
+         </LinearLayout>
 
 
-        <LinearLayout android:layout_width="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginLeft="16dp"
-            android:gravity="center_horizontal"
-            android:layout_height="wrap_content">
-            <com.pm.cameraui.widget.MyButton
-                android:id="@+id/btnSwitchCamera2"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:visibility="visible"
-                android:background="@drawable/icon_camera_switch" />
-            <TextView android:layout_width="wrap_content"
-                android:textSize="10sp"
-                android:textColor="@color/white"
-                android:text="切换摄像头"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
+         <LinearLayout android:layout_width="wrap_content"
+             android:orientation="vertical"
+             android:layout_marginLeft="16dp"
+             android:gravity="center_horizontal"
+             android:layout_height="wrap_content">
+             <com.pm.cameraui.widget.MyButton
+                 android:id="@+id/btnSwitchCamera2"
+                 android:focusable="true"
+                 android:focusableInTouchMode="true"
+                 android:layout_width="48dp"
+                 android:layout_height="48dp"
+                 android:visibility="visible"
+                 android:background="@drawable/icon_camera_switch" />
+             <TextView android:layout_width="wrap_content"
+                 android:textSize="10sp"
+                 android:textColor="@color/white"
+                 android:text="切换摄像头"
+                 android:layout_height="wrap_content"/>
+         </LinearLayout>
 
+     </LinearLayout>
 
+ </LinearLayout>
 
-
-
-    </LinearLayout>
 
 
     <com.pm.cameraui.widget.MyButton

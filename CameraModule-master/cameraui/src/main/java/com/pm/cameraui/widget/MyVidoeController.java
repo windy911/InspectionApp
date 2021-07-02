@@ -68,10 +68,13 @@ public class MyVidoeController extends RelativeLayout {
         btnStart.setOnClickListener(view -> {
             if (mCallback != null) {
                 if (!isValidClick()) return;
+
+
                 if (mCallback != null) {
                     mCallback.recordStart();
                     setRecordDotShow(true);
                 }
+
             }
         });
         btnStop.setOnClickListener(view -> {
@@ -119,7 +122,7 @@ public class MyVidoeController extends RelativeLayout {
         btnStart.setOnFocusChangeListener(new OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean b) {
-                btnStart.setAlpha(b?1.0f:0.3f);
+                btnStart.setAlpha(b?0.95f:0.5f);
             }
         });
 

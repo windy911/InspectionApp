@@ -165,8 +165,7 @@ public class CameraActivity extends AppCompatActivity  {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-//        if (KeyEvent.KEYCODE_ALL_APPS == keyCode) {
-        if (KeyEvent.KEYCODE_VOLUME_DOWN == keyCode) {
+        if (KeyEvent.KEYCODE_ALL_APPS == keyCode) {
             ((VideoFragment) fragment).onVoiceKeyDown();
         }
         return super.onKeyDown(keyCode, event);
@@ -176,7 +175,6 @@ public class CameraActivity extends AppCompatActivity  {
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         if (KeyEvent.KEYCODE_ALL_APPS == keyCode) {
-//        if (KeyEvent.KEYCODE_VOLUME_DOWN == keyCode) {
             ((VideoFragment) fragment).onVoiceKeyUp();
         }
         return super.onKeyUp(keyCode, event);
