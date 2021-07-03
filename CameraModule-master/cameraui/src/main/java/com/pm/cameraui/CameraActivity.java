@@ -205,7 +205,7 @@ public class CameraActivity extends AppCompatActivity  {
     AMapLocationListener mAMapLocationListener = new AMapLocationListener() {
         @Override
         public void onLocationChanged(AMapLocation amapLocation) {
-            Log.d("RAMBO", "onLocationChanged " + amapLocation.toStr());
+//            Log.d("RAMBO", "onLocationChanged " + amapLocation.toStr());
             if (amapLocation != null) {
                 if (amapLocation.getErrorCode() == 0) {
                     //解析定位结果

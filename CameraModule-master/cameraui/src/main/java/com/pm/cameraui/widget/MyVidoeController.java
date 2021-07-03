@@ -13,11 +13,14 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.pm.cameraui.Constants;
 import com.pm.cameraui.R;
 import com.pm.cameraui.base.MyGestureListener;
+import com.pm.cameraui.utils.DeviceUtil;
 import com.pm.cameraui.utils.TimeUtil;
+import com.pm.cameraui.utils.ToastUtils;
 
 public class MyVidoeController extends RelativeLayout {
 
@@ -70,15 +73,18 @@ public class MyVidoeController extends RelativeLayout {
         voiceProgress = findViewById(R.id.voiceProgress);
         btnExitApp = findViewById(R.id.btnExitApp);
         btnStart.setOnClickListener(view -> {
+
+            if(!DeviceUtil.checkDiskSize()){
+                Toast.makeText(getContext(),"存储空间不足，请清理设备后使用!",Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             if (mCallback != null) {
                 if (!isValidClick()) return;
-
-
                 if (mCallback != null) {
                     mCallback.recordStart();
                     setRecordDotShow(true);
                 }
-
             }
         });
         btnStop.setOnClickListener(view -> {

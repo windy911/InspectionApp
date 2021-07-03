@@ -38,6 +38,7 @@ import com.pm.cameraui.bean.Topic;
 import com.pm.cameraui.bean.UploadStatus;
 import com.pm.cameraui.mvp.VideoPresenter;
 import com.pm.cameraui.mvp.VideoView;
+import com.pm.cameraui.utils.DeviceUtil;
 import com.pm.cameraui.utils.FileUtils;
 import com.pm.cameraui.utils.LocationUtil;
 import com.pm.cameraui.utils.MarkUtil;
@@ -459,9 +460,21 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         UploadUtil.mergeVideos(getActivity(), mergeVideoPath, recordFileList, new UploadUtil.OnMergeSuccessListener() {
             @Override
             public void onMergeSuccess(String outFile) {
-                Log.d("RAMBO", "合成成功了文件：" + outFile);
-                clearSaveList();
-                stopInspectionTopic(outFile);
+                if(!TextUtils.isEmpty(outFile)){
+                    Log.d("RAMBO", "合成成功了文件：" + outFile);
+                    clearSaveList();
+                    stopInspectionTopic(outFile);
+                }else {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            showLoading(false);
+                            CameraActivity.instance.hideNavigation();
+                            presenter.getInspectionTopic();
+                            Toast.makeText(getContext(),"视频处理失败",Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
             }
         });
     }
@@ -597,11 +610,15 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         RecordSaveUtils.removeRecordSave(getActivity(), recordSave);
         if (RecordSaveUtils.haveLocalSaves(getActivity())) {
             startBackgroundUpload();
+        }else{
+            //没有待上传的数据文件，做本地残余文件删除处理工作
+            DeviceUtil.clearMediaFiles(getContext());
         }
     }
 
     //关闭当前InspcetionTopic任务，上传数据。显示对话框。拿到了合并后的视频文件地址，还有更新录制时长。
     public void stopInspectionTopic(String videoFilePath) {
+        if(TextUtils.isEmpty(videoFilePath)){return;}
         //用savePeriodTime来记录最后清零前的计时器数据
         inspectRecord = RecordUtil.endRecord(inspectRecord, savePeriodTime);
         new ShareDialog(inspectRecord)
@@ -886,10 +903,17 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         if (size > 0) {
             RecordSave recordSave = recordSaveList.recordSaves.get(recordSaveList.recordSaves.size() - 1);
             uploadSave(recordSave);
+        }else{
+            //没有待上传的数据文件，做本地残余文件删除处理工作
+            DeviceUtil.clearMediaFiles(getContext());
         }
     }
 
     public void uploadSave(RecordSave recordSave) {
+//        if(TextUtils.isEmpty(recordSave.videoFilePath)){
+//            RecordSaveUtils.removeRecordSave(getActivity(), recordSave);
+//            return;
+//        }
         uploadVideoFileToHuaWei_2(recordSave);
     }
 
