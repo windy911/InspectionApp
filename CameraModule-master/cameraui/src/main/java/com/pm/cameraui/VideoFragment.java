@@ -16,6 +16,8 @@ import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -692,6 +694,8 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         Log.d("RAMBO", "Voice单击事件触发拍照功能！");
         markRecord(true);
         isForVoiceMark = false;
+        isStartVoice = false;
+        myVideoController.hideVoiceMarker();
     }
 
     //长按开始
@@ -709,8 +713,6 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     //长按结束
     public void onMarkLongClickEnd(long voiceDuration) {
         isStartVoice = false;
-//        ToastUtils.show("录音结束");
-        Log.d("RAMBO", "Voice长按相结束,voiceDuration = " + voiceDuration);
         myVideoController.hideVoiceMarker();
         endVoiceMark();
     }
@@ -755,6 +757,9 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
                 onMarkShortClicked();
             } else if (audioUpTime - audioDownTime > 1000) {
                 onMarkLongClickEnd(audioUpTime - audioDownTime);
+            } else{
+                isStartVoice = false;
+                myVideoController.hideVoiceMarker();
             }
         }
         isEnableVoiceKey = true;
@@ -923,4 +928,6 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     public void slideUp(){myVideoController.slideFocusChange(MyGestureListener.DIR_UP);}
     public void slideLeft(){myVideoController.slideFocusChange(MyGestureListener.DIR_LEFT);}
     public void slideRight(){myVideoController.slideFocusChange(MyGestureListener.DIR_RIGHT);}
+
+
 }

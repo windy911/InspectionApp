@@ -10,6 +10,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -59,6 +61,17 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainVie
 
     }
 
+    public void doClickAnim(View view) {
+        if(!Constants.isAniClick)return;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Animation setAnim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.view_click);
+                view.startAnimation(setAnim);
+            }
+        });
+    }
+
     public void initView() {
         edtLoginName = findViewById(R.id.edtLoginName);
         edtLoginPswd = findViewById(R.id.edtLoginPswd);
@@ -68,6 +81,7 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainVie
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                doClickAnim(view);
                 login();
             }
         });
@@ -75,7 +89,7 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainVie
         btnLogin.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean b) {
-                btnLogin.setAlpha(b?1.0f:0.3f);
+                btnLogin.setAlpha(b ? 1.0f : 0.3f);
             }
         });
 

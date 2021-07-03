@@ -1,5 +1,6 @@
 package com.pm.cameraui.widget;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.AttributeSet;
@@ -13,6 +14,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.pm.cameraui.Constants;
 import com.pm.cameraui.R;
 import com.pm.cameraui.base.MyGestureListener;
 import com.pm.cameraui.utils.TimeUtil;
@@ -29,6 +31,8 @@ public class MyVidoeController extends RelativeLayout {
     LinearLayout llMarkSuccess;
     LinearLayout llImageMarking;
     boolean isTaskRecording = false;
+
+    boolean isAniVoiceMarkerShowing = false;
 
     public MyVidoeController(Context context) {
         super(context);
@@ -186,15 +190,41 @@ public class MyVidoeController extends RelativeLayout {
         }
     }
 
+
     public void showVoiceMarker(int progress) {
         Log.d("RAMBO", "voice progress = " + progress);
         llVoiceMark.setVisibility(View.VISIBLE);
         voiceProgress.setMax(100);
         voiceProgress.setProgress(100-progress);
+
+        Animation setAnim = AnimationUtils.loadAnimation(getContext(), R.anim.view_translate_top_in);
+        setAnim.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {//动画开始的时候的监听，
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {//动画重复的时候监听
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {//动画结束的时候监听
+
+            }
+        });
+
+        if(!isAniVoiceMarkerShowing){
+            isAniVoiceMarkerShowing =true;
+            llVoiceMark.startAnimation(setAnim);
+        }
+
     }
 
     public void hideVoiceMarker() {
         llVoiceMark.setVisibility(View.GONE);
+        isAniVoiceMarkerShowing =false;
     }
 
     public void showBackgroundAction(boolean isShow) {
@@ -207,18 +237,25 @@ public class MyVidoeController extends RelativeLayout {
     public void onClicked() {
         if (btnStart.isFocused()) {
             btnStart.performClick();
+            doClickAnim(btnStart);
         } else if (btnSwitchCamera.isFocused()) {
             btnSwitchCamera.performClick();
+            doClickAnim(btnSwitchCamera);
         } else if (btnSwitchCamera2.isFocused()) {
             btnSwitchCamera2.performClick();
+            doClickAnim(btnSwitchCamera2);
         } else if (btnExitApp.isFocused()) {
             btnExitApp.performClick();
+            doClickAnim(btnExitApp);
         } else if (btnPause.isFocused()) {
             btnPause.performClick();
+            doClickAnim(btnPause);
         } else if (btnContinue.isFocused()) {
             btnContinue.performClick();
+            doClickAnim(btnContinue);
         } else if (btnStop.isFocused()) {
             btnStop.performClick();
+            doClickAnim(btnStop);
         }
     }
 
@@ -232,13 +269,21 @@ public class MyVidoeController extends RelativeLayout {
 
     public void showImageMarking(){
         llImageMarking.setVisibility(View.VISIBLE);
+        Animation setAnim = AnimationUtils.loadAnimation(getContext(), R.anim.view_translate_top_in);
+        llImageMarking.startAnimation(setAnim);
     }
     public void hideImageMarkding(){
         llImageMarking.setVisibility(View.GONE);
     }
 
     public void showMarkSuccess(){
+
         llMarkSuccess.setVisibility(View.VISIBLE);
+
+        Animation setAnim = AnimationUtils.loadAnimation(getContext(), R.anim.view_translate_top_in);
+        llMarkSuccess.startAnimation(setAnim);
+
+
     }
 
     public void hideMarkSuccess(){
@@ -375,5 +420,14 @@ public class MyVidoeController extends RelativeLayout {
         llRecording.startAnimation(animation);
     }
 
-
+    public void doClickAnim(View view) {
+        if(!Constants.isAniClick)return;
+        ((Activity)getContext()).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Animation setAnim = AnimationUtils.loadAnimation(getContext(), R.anim.view_click);
+                view.startAnimation(setAnim);
+            }
+        });
+    }
 }

@@ -1,14 +1,18 @@
 package com.pm.cameraui.widget;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
+import com.pm.cameraui.Constants;
 import com.pm.cameraui.R;
 import com.pm.cameraui.bean.InspectRecord;
 import com.pm.cameraui.utils.TimeUtil;
@@ -252,7 +256,19 @@ public class ShareDialog extends DialogFragment {
 
     public void clicked(){
         if(confirmTv!=null){
+            doClickAnim(confirmTv);
             confirmTv.performClick();
         }
+    }
+
+    public void doClickAnim(View view) {
+        if(!Constants.isAniClick)return;
+        ((Activity)getContext()).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Animation setAnim = AnimationUtils.loadAnimation(getContext(), R.anim.view_click);
+                view.startAnimation(setAnim);
+            }
+        });
     }
 }

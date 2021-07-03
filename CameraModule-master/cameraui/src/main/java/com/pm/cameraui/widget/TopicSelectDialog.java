@@ -1,5 +1,6 @@
 package com.pm.cameraui.widget;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -8,6 +9,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -290,11 +293,13 @@ public class TopicSelectDialog extends DialogFragment implements View.OnClickLis
     public void clicked() {
         if (btnExit.isFocused()) {
             btnExit.performClick();
+            doClickAnim(btnExit);
         } else {
             if (!confirmButton.isFocused()) {
                 confirmButton.requestFocus();
                 clearIndexSign();
             } else if (confirmButton.isFocused()) {
+                doClickAnim(confirmButton);
                 confirmButton.performClick();
             }
         }
@@ -313,5 +318,16 @@ public class TopicSelectDialog extends DialogFragment implements View.OnClickLis
 
     public interface OnDialogAction {
         void onDismiss();
+    }
+
+    public void doClickAnim(View view) {
+        if(!Constants.isAniClick)return;
+        ((Activity)getContext()).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Animation setAnim = AnimationUtils.loadAnimation(getContext(), R.anim.view_click);
+                view.startAnimation(setAnim);
+            }
+        });
     }
 }
