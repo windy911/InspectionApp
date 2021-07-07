@@ -22,8 +22,7 @@ public class MainPresenter extends BasePresenter<MainView> {
             public void onSuccess(UserInfo o) {
                 isLoading = false;
                 baseView.onLogin(o);
-                SPHelp.getInstance(baseView.getActivity()).setStringValue(SPHelp.SP_LOGIN_NAME, userName);
-                SPHelp.getInstance(baseView.getActivity()).setStringValue(SPHelp.SP_LOGIN_PASSWORD, password);
+
             }
 
             @Override

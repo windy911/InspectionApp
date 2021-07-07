@@ -457,6 +457,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         resetUI();
         String mergeVideoPath = createVideoFilePath(getActivity());
         showLoading(true);
+
         UploadUtil.mergeVideos(getActivity(), mergeVideoPath, recordFileList, new UploadUtil.OnMergeSuccessListener() {
             @Override
             public void onMergeSuccess(String outFile) {
@@ -465,18 +466,31 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
                     clearSaveList();
                     stopInspectionTopic(outFile);
                 }else {
-                    getActivity().runOnUiThread(new Runnable() {
+                    UploadUtil.mergeVideosSlow(getActivity(), mergeVideoPath, recordFileList, new UploadUtil.OnMergeSuccessListener(){
                         @Override
-                        public void run() {
-                            showLoading(false);
-                            CameraActivity.instance.hideNavigation();
-                            presenter.getInspectionTopic();
-                            Toast.makeText(getContext(),"视频处理失败",Toast.LENGTH_SHORT).show();
+                        public void onMergeSuccess(String outFile) {
+                            if(!TextUtils.isEmpty(outFile)){
+                                Log.d("RAMBO", "合成成功了文件：" + outFile);
+                                clearSaveList();
+                                stopInspectionTopic(outFile);
+                            }else {
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        showLoading(false);
+                                        CameraActivity.instance.hideNavigation();
+                                        presenter.getInspectionTopic();
+                                        Toast.makeText(getContext(),"视频处理失败",Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
                         }
                     });
                 }
             }
         });
+
+
     }
 
     private String createVideoFilePath(Context context) {

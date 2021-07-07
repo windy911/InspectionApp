@@ -99,12 +99,13 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainVie
         boolean isRemmember = SPHelp.getInstance(getActivity()).getBooleanValue(SPHelp.SP_IS_REMMEMBER, true);
         cbRemmenber.setChecked(isRemmember);
 
+        //默认会自动记住用户名，密码必须勾选才记住
+        String userName = SPHelp.getInstance(getActivity()).getStringValue(SPHelp.SP_LOGIN_NAME);
+        edtLoginName.setText(userName);
 
         if (cbRemmenber.isChecked()) {
-            String userName = SPHelp.getInstance(getActivity()).getStringValue(SPHelp.SP_LOGIN_NAME);
             String password = SPHelp.getInstance(getActivity()).getStringValue(SPHelp.SP_LOGIN_PASSWORD);
-            if ((!TextUtils.isEmpty(userName)) && (!TextUtils.isEmpty(password))) {
-                edtLoginName.setText(userName);
+            if (!TextUtils.isEmpty(password)) {
                 edtLoginPswd.setText(password);
             }
         }
@@ -158,13 +159,18 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainVie
 
     @Override
     public void onLogin(UserInfo o) {
-//        Toast.makeText(getApplication(), "登录成功！" + o.getUserId(), Toast.LENGTH_SHORT).show();
+        //登录成功保存用户名，密码根据checkbox
         Constants.userInfo = o;
         startActivity(CameraActivity.newIntent(MainActivity.this, CameraActivity.TYPE_VIDEO));
 
+
+        SPHelp.getInstance(getActivity()).setStringValue(SPHelp.SP_LOGIN_NAME, edtLoginName.getText().toString());
         if (!cbRemmenber.isChecked()) {
-            edtLoginName.setText("");
+//            edtLoginName.setText("");
             edtLoginPswd.setText("");
+            SPHelp.getInstance(getActivity()).setStringValue(SPHelp.SP_LOGIN_PASSWORD, "");
+        }else {
+            SPHelp.getInstance(getActivity()).setStringValue(SPHelp.SP_LOGIN_PASSWORD, edtLoginPswd.getText().toString());
         }
     }
 

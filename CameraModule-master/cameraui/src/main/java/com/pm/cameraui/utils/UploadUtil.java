@@ -3,7 +3,6 @@ package com.pm.cameraui.utils;
 import android.content.Context;
 import android.util.Log;
 
-
 import com.obs.services.ObsClient;
 import com.obs.services.exception.ObsException;
 import com.obs.services.model.AccessControlList;
@@ -106,51 +105,117 @@ public class UploadUtil {
      * @param videoPath 待合并的文件路径列表
      */
     public static void mergeVideos(Context context, String outFile, List<String> videoPath, OnMergeSuccessListener onMergeSuccessListener) {
-        ArrayList<EpVideo> epVideos = new ArrayList<>();
-        for (String url : videoPath) {
-            Log.e(TAG, "RAMBO 合并开始文件 = " + url);
-            epVideos.add(new EpVideo(url));
-        }
 
+        if(videoPath.size()==1){
+            //当只有一个视频不需要合并
+            long TimeStart = System.currentTimeMillis();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    FileUtils.copyFile(videoPath.get(0),outFile);
+                    Log.d("RAMBO","RAMBO 拷贝视频花费时间："+(System.currentTimeMillis()-TimeStart)+"毫秒");
+                    onMergeSuccessListener.onMergeSuccess(outFile);
+                }
+            }).start();
 
-        try{
+        } else if(videoPath.size()>1){
+            ArrayList<EpVideo> epVideos = new ArrayList<>();
+            for (String url : videoPath) {
+                Log.e(TAG, "RAMBO 合并开始文件 = " + url);
+                epVideos.add(new EpVideo(url));
+            }
 
-            Log.e(TAG, "RAMBO 合并开始 epVideos size = " + epVideos.size());
-
-
-
+            try {
+                Log.e(TAG, "RAMBO 合并开始 epVideos size = " + epVideos.size());
+            //merge 方法速度太慢了，mergeByLc速度更快但会莫名的直接失败。
             EpEditor.mergeByLc(context, epVideos, new EpEditor.OutputOption(outFile), new OnEditorListener() {
-                @Override
-                public void onSuccess() {
-                    Log.e(TAG, "合并成功 输出路径：" + outFile);
-                    for (String path : videoPath) {
-                        Log.e(TAG, "RAMBO 合并成功清理删除临时文件：" + path);
-                        FileUtils.deleteFile(path);
+//                EpEditor.merge(epVideos, new EpEditor.OutputOption(outFile), new OnEditorListener() {
+                    @Override
+                    public void onSuccess() {
+                        Log.e(TAG, "合并成功 输出路径：" + outFile);
+                        for (String path : videoPath) {
+                            Log.e(TAG, "RAMBO 合并成功清理删除临时文件：" + path);
+                            FileUtils.deleteFile(path);
+                        }
+                        if (onMergeSuccessListener != null) {
+                            onMergeSuccessListener.onMergeSuccess(outFile);
+                        }
                     }
-                    if (onMergeSuccessListener != null) {
-                        onMergeSuccessListener.onMergeSuccess(outFile);
-                    }
-                }
 
-                @Override
-                public void onFailure() {
-                    Log.e(TAG, "RAMBO 合并失败");
-                    if (onMergeSuccessListener != null) {
-                        onMergeSuccessListener.onMergeSuccess("");
+                    @Override
+                    public void onFailure() {
+                        Log.e(TAG, "RAMBO 合并失败");
+                        if (onMergeSuccessListener != null) {
+                            onMergeSuccessListener.onMergeSuccess("");
+                        }
                     }
-                }
 
-                @Override
-                public void onProgress(float progress) {
-                    Log.i(TAG, "合并中，进度：" + progress);
+                    @Override
+                    public void onProgress(float progress) {
+                        Log.i(TAG, "合并中，进度：" + progress);
+                    }
+                });
+            } catch (Exception e) {
+                Log.e(TAG, "RAMBO 合并失败 e =" + e);
+                if (onMergeSuccessListener != null) {
+                    onMergeSuccessListener.onMergeSuccess("");
                 }
-            });
-        }catch (Exception e){
-            Log.e(TAG, "RAMBO 合并失败 e =" +e);
-            if (onMergeSuccessListener != null) {
-                onMergeSuccessListener.onMergeSuccess("");
             }
         }
+
+
+
+    }
+
+//多条合并快速失败后慢速实现
+    public static void mergeVideosSlow(Context context, String outFile, List<String> videoPath, OnMergeSuccessListener onMergeSuccessListener) {
+
+
+            ArrayList<EpVideo> epVideos = new ArrayList<>();
+            for (String url : videoPath) {
+                Log.e(TAG, "RAMBO 合并开始文件 = " + url);
+                epVideos.add(new EpVideo(url));
+            }
+
+            try {
+                Log.e(TAG, "RAMBO 合并开始 epVideos size = " + epVideos.size());
+                //merge 方法速度太慢了，mergeByLc速度更快但会莫名的直接失败。
+                //EpEditor.mergeByLc(context, epVideos, new EpEditor.OutputOption(outFile), new OnEditorListener() {
+                                 EpEditor.merge(epVideos, new EpEditor.OutputOption(outFile), new OnEditorListener() {
+                    @Override
+                    public void onSuccess() {
+                        Log.e(TAG, "合并成功 输出路径：" + outFile);
+                        for (String path : videoPath) {
+                            Log.e(TAG, "RAMBO 合并成功清理删除临时文件：" + path);
+                            FileUtils.deleteFile(path);
+                        }
+                        if (onMergeSuccessListener != null) {
+                            onMergeSuccessListener.onMergeSuccess(outFile);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.e(TAG, "RAMBO 合并失败");
+                        if (onMergeSuccessListener != null) {
+                            onMergeSuccessListener.onMergeSuccess("");
+                        }
+                    }
+
+                    @Override
+                    public void onProgress(float progress) {
+                        Log.i(TAG, "合并中，进度：" + progress);
+                    }
+                });
+            } catch (Exception e) {
+                Log.e(TAG, "RAMBO 合并失败 e =" + e);
+                if (onMergeSuccessListener != null) {
+                    onMergeSuccessListener.onMergeSuccess("");
+                }
+            }
+
+
+
 
     }
 
