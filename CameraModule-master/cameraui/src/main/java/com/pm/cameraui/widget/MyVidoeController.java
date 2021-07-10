@@ -426,6 +426,10 @@ public class MyVidoeController extends RelativeLayout {
         llRecording.startAnimation(animation);
     }
 
+    public void hideControler(){
+        llRecording.setVisibility(View.GONE);
+    }
+
     public void doClickAnim(View view) {
         if(!Constants.isAniClick)return;
         ((Activity)getContext()).runOnUiThread(new Runnable() {

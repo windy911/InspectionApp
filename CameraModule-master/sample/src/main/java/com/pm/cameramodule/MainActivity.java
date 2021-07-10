@@ -110,6 +110,9 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainVie
             }
         }
 
+//        edtLoginName.setText("17700010002");
+//        edtLoginPswd.setText("Hqwe123");
+
 
         detector = new GestureDetector(this, new MyGestureListener(
                 new MyRightLeftListener() {

@@ -205,7 +205,6 @@ public class CameraActivity extends AppCompatActivity  {
     AMapLocationListener mAMapLocationListener = new AMapLocationListener() {
         @Override
         public void onLocationChanged(AMapLocation amapLocation) {
-//            Log.d("RAMBO", "onLocationChanged " + amapLocation.toStr());
             if (amapLocation != null) {
                 if (amapLocation.getErrorCode() == 0) {
                     //解析定位结果
@@ -213,7 +212,6 @@ public class CameraActivity extends AppCompatActivity  {
                         LocationUtil.locationList.add(new InsLocation(amapLocation.getLatitude() + "", amapLocation.getLongitude() + "", "", System.currentTimeMillis()));
                         //可在其中解析amapLocation获取相应内容。
                         Log.e("RAMBO", "size = " + LocationUtil.locationList.size() + " 经度:" + amapLocation.getLatitude() + ", 维度:" + amapLocation.getLongitude());
-//                        Toast.makeText(CameraActivity.this, " 经度:" + amapLocation.getLatitude() + ", 维度:" + amapLocation.getLongitude(),Toast.LENGTH_SHORT).show();
                         longitude = String.valueOf(amapLocation.getLongitude());
                         latitude = String.valueOf(amapLocation.getLatitude());
                     }

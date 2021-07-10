@@ -60,7 +60,6 @@
         android:focusableInTouchMode="true"
         android:singleLine="true"
         android:paddingLeft="16dp"
-
         android:hint="请输入账号"
         android:textColor="@color/white"
         android:textSize="12sp"

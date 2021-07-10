@@ -165,7 +165,6 @@ public class VideoPresenter extends BasePresenter<VideoView> {
 
         Log.d("RAMBO","updateMarkRecord2()");
         if(baseView!=null&&mark==null){
-
             return;
         }
 
@@ -173,9 +172,8 @@ public class VideoPresenter extends BasePresenter<VideoView> {
             @Override
             public void onSuccess(Mark o) {
                 Log.d("RAMBO","updateMarkRecord Success :" +mark.toString());
-//                if(MarkUtil.isFinishUpload()){
-//                    baseView.onTaskFinish();
-//                }
+
+
             }
             @Override
             public void onError(String msg) {

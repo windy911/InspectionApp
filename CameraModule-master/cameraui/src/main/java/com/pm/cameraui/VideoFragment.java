@@ -323,9 +323,14 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         mRecordDelegate.startBackgroundThread();
         refreshTimer();
         isFinishedTask = false;
+
     }
 
     public void stopRecording() {
+
+        myVideoController.continueRecording();
+        myVideoController.refreshUIRecord(false);
+
         if (mRecordDelegate.isRecording()) {
             mRecordDelegate.stopRecordingVideo(true);
             closeCamera();
@@ -336,8 +341,9 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
                 mergeSaveList();
             }
         }
-        myVideoController.continueRecording();
-        myVideoController.refreshUIRecord(false);
+
+
+
     }
 
     public void pauseRecording() {
@@ -466,26 +472,36 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
                     clearSaveList();
                     stopInspectionTopic(outFile);
                 }else {
-                    UploadUtil.mergeVideosSlow(getActivity(), mergeVideoPath, recordFileList, new UploadUtil.OnMergeSuccessListener(){
+                    getActivity().runOnUiThread(new Runnable() {
                         @Override
-                        public void onMergeSuccess(String outFile) {
-                            if(!TextUtils.isEmpty(outFile)){
-                                Log.d("RAMBO", "合成成功了文件：" + outFile);
-                                clearSaveList();
-                                stopInspectionTopic(outFile);
-                            }else {
-                                getActivity().runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        showLoading(false);
-                                        CameraActivity.instance.hideNavigation();
-                                        presenter.getInspectionTopic();
-                                        Toast.makeText(getContext(),"视频处理失败",Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                            }
+                        public void run() {
+                            showLoading(false);
+                            CameraActivity.instance.hideNavigation();
+                            presenter.getInspectionTopic();
+                            Toast.makeText(getContext(),"视频处理失败",Toast.LENGTH_SHORT).show();
                         }
                     });
+//
+//                    UploadUtil.mergeVideosSlow(getActivity(), mergeVideoPath, recordFileList, new UploadUtil.OnMergeSuccessListener(){
+//                        @Override
+//                        public void onMergeSuccess(String outFile) {
+//                            if(!TextUtils.isEmpty(outFile)){
+//                                Log.d("RAMBO", "合成成功了文件：" + outFile);
+//                                clearSaveList();
+//                                stopInspectionTopic(outFile);
+//                            }else {
+//                                getActivity().runOnUiThread(new Runnable() {
+//                                    @Override
+//                                    public void run() {
+//                                        showLoading(false);
+//                                        CameraActivity.instance.hideNavigation();
+//                                        presenter.getInspectionTopic();
+//                                        Toast.makeText(getContext(),"视频处理失败",Toast.LENGTH_SHORT).show();
+//                                    }
+//                                });
+//                            }
+//                        }
+//                    });
                 }
             }
         });
@@ -609,6 +625,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         inspectRecord = record;
         markList = new ArrayList<>();
         CameraActivity.instance.location();
+        myVideoController.hideControler();
     }
 
     @Override
@@ -620,13 +637,12 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     public void updateInspection2(RecordSave recordSave) {
         MarkUtil.generateAudioForMarks(recordSave.inspectRecord, recordSave.markList, presenter, true);
 
-        //大的总视频文件上传成功了！,删除记录条
         RecordSaveUtils.removeRecordSave(getActivity(), recordSave);
         if (RecordSaveUtils.haveLocalSaves(getActivity())) {
             startBackgroundUpload();
         }else{
             //没有待上传的数据文件，做本地残余文件删除处理工作
-            DeviceUtil.clearMediaFiles(getContext());
+//            DeviceUtil.clearMediaFiles(getContext());
         }
     }
 
@@ -843,6 +859,8 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
             @Override
             public void onDismiss() {
                 myVideoController.startInit();
+                showLoading(false);
+                LocationUtil.clearAll();
             }
         });
         dialog.show(getFragmentManager(), "TopicDialog");
@@ -855,7 +873,12 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     }
 
     public void showLoading(boolean isShow) {
-        rlLoading.setVisibility(isShow ? View.VISIBLE : View.GONE);
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                rlLoading.setVisibility(isShow ? View.VISIBLE : View.GONE);
+            }
+        });
     }
 
     @Override
@@ -919,7 +942,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
             uploadSave(recordSave);
         }else{
             //没有待上传的数据文件，做本地残余文件删除处理工作
-            DeviceUtil.clearMediaFiles(getContext());
+//            DeviceUtil.clearMediaFiles(getContext());
         }
     }
 

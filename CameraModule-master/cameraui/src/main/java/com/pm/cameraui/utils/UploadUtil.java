@@ -11,6 +11,7 @@ import com.obs.services.model.ObjectMetadata;
 import com.obs.services.model.ProgressListener;
 import com.obs.services.model.UploadFileRequest;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -108,13 +109,19 @@ public class UploadUtil {
 
         if(videoPath.size()==1){
             //当只有一个视频不需要合并
-            long TimeStart = System.currentTimeMillis();
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    FileUtils.copyFile(videoPath.get(0),outFile);
-                    Log.d("RAMBO","RAMBO 拷贝视频花费时间："+(System.currentTimeMillis()-TimeStart)+"毫秒");
-                    onMergeSuccessListener.onMergeSuccess(outFile);
+                        Log.d("RAMBO","只有一个文件："+videoPath.get(0));
+
+                        try{
+                            //重命名
+                            //new File(videoPath.get(0)).renameTo(new File(outFile));
+
+                            onMergeSuccessListener.onMergeSuccess(videoPath.get(0));
+                        }catch (Exception e){
+                            onMergeSuccessListener.onMergeSuccess("");
+                        }
                 }
             }).start();
 

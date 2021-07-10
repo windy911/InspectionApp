@@ -78,7 +78,7 @@ public class MarkUtil {
                 for(Mark mark :markList){
                     //循环把为上传的标记做适配剪辑和上传
                     if (!mark.getStartTimeLong().equals(mark.getEndTimeLong()) && StringUtils.isEmpty(mark.getVedioUrl())){
-                        Log.e("MarkUpload","markid="+mark.getId()+"开始处理");
+                        Log.e("RAMBO","markid="+mark.getId()+"开始处理");
                         Runnable markTask = new Runnable() {
                             @Override
                             public void run() {
@@ -88,10 +88,10 @@ public class MarkUtil {
                                     @Override
                                     public void onClipSuccess(File outFile) {
                                         //上传剪辑的视频文件
-                                        Log.e("MarkUpload","markid="+mark.getId()+"文件剪辑成功");
+                                        Log.e("RAMBO","markid="+mark.getId()+"文件剪辑成功");
                                         UploadUtil.upload(outFile.getAbsolutePath(),  null, (localPath, remoteUrl) -> {
                                             mark.setVedioUrl(remoteUrl);
-                                            Log.e("MarkUpload","markid="+mark.getId()+"文件上传成功");
+                                            Log.e("RAMBO","markid="+mark.getId()+"文件上传成功");
                                             mark.setVedioLocalPath(outFile.getAbsolutePath());
                                             mark.setMarkType(1);
 //                                            DaoManager.getInstance().getSession().getMarkDao().update(mark);
@@ -120,7 +120,6 @@ public class MarkUtil {
                                 }else {
                                     presenter.updateMarkRecord(null);
                                 }
-
                             }
                             Thread.sleep(2000);
                         } catch (InterruptedException e) {
@@ -136,9 +135,27 @@ public class MarkUtil {
                         presenter.updateMarkRecord(null);
                     }
                 }
+
+                try{
+                    Thread.sleep(10*1000);
+                    cleanLocalVideoFile(record);
+                }catch (Exception e){
+
+                }
             }
         }).start();
+    }
 
+    public static void cleanLocalVideoFile(InspectRecord record){
+        //大的总视频文件上传成功了！,删除记录条
+        try{
+            if(record!=null){
+                FileUtils.deleteFile(record.getLocalVideoFilePath());
+                Log.d("RAMBO"," cleanLocalVideoFile:"+record.getLocalVideoFilePath());
+            }
+        }catch (Exception e){
+                Log.d("RAMBO"," cleanLocalVideoFile 失败！");
+        }
     }
 
     public static void delUploadCount(){
@@ -156,6 +173,7 @@ public class MarkUtil {
         Log.d("RAMBO","resetUploadCount markUploadCount = " + markUploadCount);
     }
     public static boolean isFinishUpload(){
+
         return markUploadCount == 0;
     }
 
