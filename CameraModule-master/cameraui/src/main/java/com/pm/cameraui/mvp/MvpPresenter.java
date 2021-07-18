@@ -44,16 +44,16 @@ public class MvpPresenter extends BasePresenter<MvpView> {
     }
 
     public void getAppConfiguration(){
-        addDisposable(apiServer.getAppConfiguration(), new BaseObserver<AppConfig>(baseView) {
-            @Override
-            public void onSuccess(AppConfig o) {
-                baseView.showJsonText(new Gson().toJson(o));
-            }
-            @Override
-            public void onError(String msg) {
-                baseView.showError(msg);
-            }
-        });
+//        addDisposable(apiServer.getAppConfiguration(), new BaseObserver<AppConfig>(baseView) {
+//            @Override
+//            public void onSuccess(AppConfig o) {
+//                baseView.showJsonText(new Gson().toJson(o));
+//            }
+//            @Override
+//            public void onError(String msg) {
+//                baseView.showError(msg);
+//            }
+//        });
     }
 
     public void newInspectRecord(InspectRecord inspectRecord){

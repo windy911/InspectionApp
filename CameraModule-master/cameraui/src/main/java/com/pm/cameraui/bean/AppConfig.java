@@ -2,7 +2,7 @@ package com.pm.cameraui.bean;
 
 public class AppConfig {
     public String lbsClockTime = "3000";
-    public HuaweiCloudConfig huaweiCloudConfig = new HuaweiCloudConfig();
+    public HuaweiCloudConfig huaWeiCloudConfig = new HuaweiCloudConfig();
     public long appMiniDiskSpace = 1024 * 1024 * 200;
 
 //    {"huaWeiCloudConfig":

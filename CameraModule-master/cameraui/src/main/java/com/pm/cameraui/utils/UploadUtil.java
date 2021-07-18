@@ -10,6 +10,8 @@ import com.obs.services.model.CompleteMultipartUploadResult;
 import com.obs.services.model.ObjectMetadata;
 import com.obs.services.model.ProgressListener;
 import com.obs.services.model.UploadFileRequest;
+import com.pm.cameraui.Constants;
+import com.pm.cameraui.bean.AppConfig;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -34,7 +36,7 @@ public class UploadUtil {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                AppConfig.HuaweiCloudConfig huaweiCloudConfig = Constants.appConfig.huaweiCloudConfig;
+                AppConfig.HuaweiCloudConfig huaweiCloudConfig = Constants.appConfig.huaWeiCloudConfig;
                 String objectKey = "video/" + filePath.substring(filePath.lastIndexOf("/") + 1);
                 ObsClient obsClient = new ObsClient(huaweiCloudConfig.ak, huaweiCloudConfig.sk, huaweiCloudConfig.endPoint);
                 UploadFileRequest request = new UploadFileRequest(huaweiCloudConfig.bucketName, objectKey);
@@ -72,7 +74,7 @@ public class UploadUtil {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                AppConfig.HuaweiCloudConfig huaweiCloudConfig = Constants.appConfig.huaweiCloudConfig;
+                AppConfig.HuaweiCloudConfig huaweiCloudConfig = Constants.appConfig.huaWeiCloudConfig;
                 String objectKey = "pic/" + filePath.substring(filePath.lastIndexOf("/") + 1);
                 ObsClient obsClient = new ObsClient(huaweiCloudConfig.ak, huaweiCloudConfig.sk, huaweiCloudConfig.endPoint);
                 UploadFileRequest request = new UploadFileRequest(huaweiCloudConfig.bucketName, objectKey);

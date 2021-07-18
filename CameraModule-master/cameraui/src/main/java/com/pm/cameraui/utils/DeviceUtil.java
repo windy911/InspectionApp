@@ -5,6 +5,8 @@ import android.os.Environment;
 import android.os.StatFs;
 import android.util.Log;
 
+import com.pm.cameraui.Constants;
+
 import java.io.File;
 
 public class DeviceUtil {
@@ -13,7 +15,7 @@ public class DeviceUtil {
             File file =  Environment.getDataDirectory();
             StatFs statFs = new StatFs(file.getPath());
             long diskSize = statFs.getAvailableBytes();
-            Log.e("DeviceUtil","diskSize="+diskSize+" appMiniDiskSpace="+Constants.appConfig.appMiniDiskSpace);
+            Log.e("DeviceUtil","diskSize="+diskSize+" appMiniDiskSpace="+ Constants.appConfig.appMiniDiskSpace);
             return diskSize > Constants.appConfig.appMiniDiskSpace;
         } catch (Exception e) {
             e.printStackTrace();
