@@ -23,11 +23,13 @@ import android.media.MediaRecorder;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.provider.SyncStateContract;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
 import android.view.Surface;
+import android.view.TextureView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -147,15 +149,15 @@ public class RecordDelegate implements CameraDelegate {
         setupCameraOutputs(width, height);
         //step2 配置相机预览的方向
         configureTransform(width, height);
-        try {
-            //信号量中尝试获取一个许可
-            if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
-                throw new RuntimeException("Time out waiting to lock camera opening.");
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            Log.e(TAG, "openCamera: Interrupted while trying to lock camera opening.");
-        }
+//        try {
+//            //信号量中尝试获取一个许可
+//            if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
+//                throw new RuntimeException("Time out waiting to lock camera opening.");
+//            }
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//            Log.e(TAG, "openCamera: Interrupted while trying to lock camera opening.");
+//        }
         //step3 打开相机
         try {
             Log.d("RAMBO","openCamera id = "+ mCameraId);
@@ -436,10 +438,29 @@ public class RecordDelegate implements CameraDelegate {
     }
 
 
+    public static String TopicName = "";
+    public static String UserName = "";
+
     private String createVideoFilePath(Context context) {
+//        final File dir = context.getExternalFilesDir(Environment.DIRECTORY_MOVIES);
+//        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSSS", Locale.getDefault());
+//        String dateStr = dateFormat.format(new Date());
+//        return (dir == null ? "" : (dir.getAbsolutePath() + "/")) + dateStr + ".mp4";
+
+
+
         final File dir = context.getExternalFilesDir(Environment.DIRECTORY_MOVIES);
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSSS", Locale.getDefault());
-        String dateStr = dateFormat.format(new Date());
+        String dateStr = "";
+
+        if(!TextUtils.isEmpty(TopicName)){
+            dateStr+=TopicName;
+        }
+        if(!TextUtils.isEmpty(UserName)){
+            dateStr+="_"+UserName;
+        }
+        dateStr +="_"+dateFormat.format(new Date());
+
         return (dir == null ? "" : (dir.getAbsolutePath() + "/")) + dateStr + ".mp4";
     }
 

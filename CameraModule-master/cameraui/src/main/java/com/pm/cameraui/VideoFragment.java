@@ -619,6 +619,10 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     //启动一个新任务成功了
     @Override
     public void newInspectionTopic(InspectRecord record) {
+        RecordDelegate.TopicName = Constants.CURRENT_TOPIC.getName();
+        RecordDelegate.UserName = Constants.userInfo.getUserName();
+
+
         isLastVideoPath = false;
         clearSaveList();
         startRecording();
@@ -626,6 +630,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         markList = new ArrayList<>();
         CameraActivity.instance.location();
         myVideoController.hideControler();
+
     }
 
     @Override
@@ -659,6 +664,8 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
                 .setOnCertainButtonClickListener(new ShareDialog.OnCertainButtonClickListener() {
                     @Override
                     public void onCertainButtonClick() {
+                        presenter.getInspectionTopic();
+
 //                        showLoading(true);
 //                        uploadVideoFileToHuaWei(videoFilePath);
 
@@ -668,7 +675,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
                         CameraActivity.instance.hideNavigation();
                         //2.立即上传了
                         loadUploadSave();
-                        presenter.getInspectionTopic();
+//                        presenter.getInspectionTopic();
 
                         Message message = new Message();
                         message.what = HANDLER_SHOW_BG_ACTION;
