@@ -310,6 +310,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     @Override
     public void onPause() {
         super.onPause();
+        LocationUtil.setEnableLocation(false);
         myVideoController.setRecordDotShow(false);
         if (mRecordDelegate.isRecording()) {
             pauseRecording();
@@ -664,8 +665,6 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
                 .setOnCertainButtonClickListener(new ShareDialog.OnCertainButtonClickListener() {
                     @Override
                     public void onCertainButtonClick() {
-                        presenter.getInspectionTopic();
-
 //                        showLoading(true);
 //                        uploadVideoFileToHuaWei(videoFilePath);
 
@@ -675,11 +674,12 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
                         CameraActivity.instance.hideNavigation();
                         //2.立即上传了
                         loadUploadSave();
-//                        presenter.getInspectionTopic();
 
                         Message message = new Message();
                         message.what = HANDLER_SHOW_BG_ACTION;
                         uiHandler.sendMessage(message);
+
+                        presenter.getInspectionTopic();
                     }
                 }).show(getFragmentManager(), "CommonDialog");
 

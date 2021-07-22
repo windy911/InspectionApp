@@ -11,7 +11,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
@@ -26,7 +25,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 
-public class CameraActivity extends AppCompatActivity  {
+public class CameraActivity extends AppCompatActivity {
     private static final String CAMERA_TYPE_INTENT_NAME = "camera_type";
     public static final String TYPE_PICTURE = "picture";
     public static final String TYPE_VIDEO = "video";
@@ -34,7 +33,7 @@ public class CameraActivity extends AppCompatActivity  {
     public static CameraActivity instance = null;
     GestureDetector detector;
 
-    public static String longitude,latitude;
+    public static String longitude, latitude;
 
     public static Intent newIntent(Context context, String cameraType) {
         Intent intent = new Intent(context, CameraActivity.class);
@@ -74,6 +73,7 @@ public class CameraActivity extends AppCompatActivity  {
                     public void onUp() {
                         ((VideoFragment) fragment).slideUp();
                     }
+
                     @Override
                     public void onDown() {
                         ((VideoFragment) fragment).slideDown();
@@ -165,7 +165,7 @@ public class CameraActivity extends AppCompatActivity  {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (KeyEvent.KEYCODE_ALL_APPS == keyCode||KeyEvent.KEYCODE_VOLUME_DOWN == keyCode) {
+        if (KeyEvent.KEYCODE_ALL_APPS == keyCode || KeyEvent.KEYCODE_VOLUME_DOWN == keyCode) {
 //        if (KeyEvent.KEYCODE_VOLUME_DOWN == keyCode) {
             ((VideoFragment) fragment).onVoiceKeyDown();
         }
@@ -175,7 +175,7 @@ public class CameraActivity extends AppCompatActivity  {
 
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
-        if (KeyEvent.KEYCODE_ALL_APPS == keyCode||KeyEvent.KEYCODE_VOLUME_DOWN == keyCode) {
+        if (KeyEvent.KEYCODE_ALL_APPS == keyCode || KeyEvent.KEYCODE_VOLUME_DOWN == keyCode) {
 //        if (KeyEvent.KEYCODE_VOLUME_DOWN == keyCode) {
             ((VideoFragment) fragment).onVoiceKeyUp();
         }
@@ -187,38 +187,48 @@ public class CameraActivity extends AppCompatActivity  {
 
 
     public void location() {
-        if (mLocationClient == null) {
-            //初始化定位
-            mLocationClient = new AMapLocationClient(getApplicationContext());
-            //设置定位回调监听
-            mLocationClient.setLocationListener(mAMapLocationListener);
-            //启动定位
-            AMapLocationClientOption option = new AMapLocationClientOption();
-            option.setInterval(5000);
-            mLocationClient.setLocationOption(option);
-            mLocationClient.startLocation();
-            //异步获取定位结果
+//        if (mLocationClient == null) {
+        //初始化定位
+        if(mLocationClient!=null){
+            mLocationClient.stopLocation();
+            mLocationClient.onDestroy();
         }
+        mLocationClient = new AMapLocationClient(getApplicationContext());
+        //设置定位回调监听
+        restartListener();
+        mLocationClient.setLocationListener(mAMapLocationListener);
+        //启动定位
+        AMapLocationClientOption option = new AMapLocationClientOption();
+        option.setInterval(5000);
+        mLocationClient.setLocationOption(option);
+        mLocationClient.startLocation();
+        //异步获取定位结果
+//        }
     }
 
+    AMapLocationListener mAMapLocationListener;
 
-    AMapLocationListener mAMapLocationListener = new AMapLocationListener() {
-        @Override
-        public void onLocationChanged(AMapLocation amapLocation) {
-            if (amapLocation != null) {
-                if (amapLocation.getErrorCode() == 0) {
-                    //解析定位结果
-                    if (LocationUtil.isEnableRecording()) {
-                        LocationUtil.locationList.add(new InsLocation(amapLocation.getLatitude() + "", amapLocation.getLongitude() + "", "", System.currentTimeMillis()));
-                        //可在其中解析amapLocation获取相应内容。
-                        Log.e("RAMBO", "size = " + LocationUtil.locationList.size() + " 经度:" + amapLocation.getLatitude() + ", 维度:" + amapLocation.getLongitude());
-                        longitude = String.valueOf(amapLocation.getLongitude());
-                        latitude = String.valueOf(amapLocation.getLatitude());
+    public void restartListener() {
+        mAMapLocationListener = null;
+        mAMapLocationListener = new AMapLocationListener() {
+            @Override
+            public void onLocationChanged(AMapLocation amapLocation) {
+                if (amapLocation != null) {
+                    if (amapLocation.getErrorCode() == 0) {
+                        //解析定位结果
+                        if (LocationUtil.isEnableRecording()) {
+                            LocationUtil.locationList.add(new InsLocation(amapLocation.getLatitude() + "", amapLocation.getLongitude() + "", "", System.currentTimeMillis()));
+                            //可在其中解析amapLocation获取相应内容。
+                            Log.e("RAMBO", "size = " + LocationUtil.locationList.size() + " 经度:" + amapLocation.getLatitude() + ", 维度:" + amapLocation.getLongitude());
+                            longitude = String.valueOf(amapLocation.getLongitude());
+                            latitude = String.valueOf(amapLocation.getLatitude());
+                        }
                     }
                 }
             }
-        }
-    };
+        };
+    }
+
 
     @Override
     protected void onDestroy() {
@@ -233,8 +243,8 @@ public class CameraActivity extends AppCompatActivity  {
 
     public void clicked() {
         if (System.currentTimeMillis() - lastClickedTime < 1000) {
-                //防止过快产生点击事件
-                return;
+            //防止过快产生点击事件
+            return;
         }
         lastClickedTime = System.currentTimeMillis();
         ((VideoFragment) fragment).clicked();

@@ -37,17 +37,27 @@ public class VideoPresenter extends BasePresenter<VideoView> {
         });
     }
 
+    private List<Topic> saveInspectionTopic = null;
     public void getInspectionTopic(){
-        addDisposable(apiServer.getInspectionTopic(), new BaseObserver<List<Topic>>(baseView) {
-            @Override
-            public void onSuccess(List<Topic> o) {
-                baseView.showTopicList(o);
-            }
-            @Override
-            public void onError(String msg) {
-                baseView.showError(msg);
-            }
-        });
+
+        if(saveInspectionTopic!=null){
+            //把记录重新启用一次
+            Log.d("RAMBO","used saveInspectionTopic!!");
+            baseView.showTopicList(saveInspectionTopic);
+        }else {
+            addDisposable(apiServer.getInspectionTopic(), new BaseObserver<List<Topic>>(baseView) {
+                @Override
+                public void onSuccess(List<Topic> o) {
+                    saveInspectionTopic = o;
+                    baseView.showTopicList(o);
+                }
+                @Override
+                public void onError(String msg) {
+                    baseView.showError(msg);
+                }
+            });
+        }
+
     }
 
     public void getAppConfiguration(){
