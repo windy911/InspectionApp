@@ -162,18 +162,23 @@ public class CameraActivity extends AppCompatActivity {
 //        hideNavigation();
 //    }
 
+    private long ClickedLastTimer = System.currentTimeMillis();
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        // || KeyEvent.KEYCODE_VOLUME_DOWN == keyCode
         if (KeyEvent.KEYCODE_ALL_APPS == keyCode) {
-            ((VideoFragment) fragment).onVoiceKeyDown();
+            if ((System.currentTimeMillis() - ClickedLastTimer) > 2000) {
+                ((VideoFragment) fragment).onVoiceKeyDown();
+                ClickedLastTimer = System.currentTimeMillis();
+            }
         }
         return super.onKeyDown(keyCode, event);
-
     }
 
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
+        // || KeyEvent.KEYCODE_VOLUME_DOWN == keyCode
         if (KeyEvent.KEYCODE_ALL_APPS == keyCode) {
             ((VideoFragment) fragment).onVoiceKeyUp();
         }
@@ -187,7 +192,7 @@ public class CameraActivity extends AppCompatActivity {
     public void location() {
 //        if (mLocationClient == null) {
         //初始化定位
-        if(mLocationClient!=null){
+        if (mLocationClient != null) {
             mLocationClient.stopLocation();
             mLocationClient.onDestroy();
         }

@@ -17,6 +17,7 @@ public class MarkUtil {
 
     public static Mark singleImageMark(InspectRecord inspectRecord, String imageLocalFile, String imageRemoteUrl, long recordTimeLong,String longitude,String latitude) {
         if (imageLocalFile == null || inspectRecord == null) return null;
+        Log.d("RAMBO:","图片标记 StratTimeLong:"+recordTimeLong);
         Mark mark = new Mark();
         mark.setMarkType(0);//1--图片标记
         mark.setDuration(0L);//持续时间为0
