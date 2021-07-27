@@ -20,20 +20,20 @@ import com.pm.cameraui.R;
 import com.pm.cameraui.base.MyGestureListener;
 import com.pm.cameraui.utils.DeviceUtil;
 import com.pm.cameraui.utils.TimeUtil;
-import com.pm.cameraui.utils.ToastUtils;
 
 public class MyVidoeController extends RelativeLayout {
 
     CameraController.ControllerCallback mCallback;
     Button btnStart, btnSwitchCamera, btnSwitchCamera2, btnStop, btnContinue, btnPause, btnExitApp;
     LinearLayout llRecording;
-    LinearLayout llbtnContinue,llbtnPause;
+    LinearLayout llbtnContinue, llbtnPause;
     TextView tvRedDot, tvTimer;
     ProgressBar voiceProgress;
     LinearLayout llVoiceMark;
     LinearLayout llMarkSuccess;
     LinearLayout llImageMarking;
     boolean isTaskRecording = false;
+    TextView tvTimerAlert;
 
     boolean isAniVoiceMarkerShowing = false;
 
@@ -68,19 +68,20 @@ public class MyVidoeController extends RelativeLayout {
         tvTimer = findViewById(R.id.tvTimer);
         tvRedDot.setVisibility(View.GONE);
         llVoiceMark = findViewById(R.id.llVoiceMark);
+        tvTimerAlert = findViewById(R.id.tvTimerAlert);
         llMarkSuccess = findViewById(R.id.llMarkSuccess);
         llImageMarking = findViewById(R.id.llImageMarking);
         voiceProgress = findViewById(R.id.voiceProgress);
         btnExitApp = findViewById(R.id.btnExitApp);
         btnStart.setOnClickListener(view -> {
 
-            if(!DeviceUtil.checkDiskSize()){
-                Toast.makeText(getContext(),"存储空间不足，请清理设备后使用!",Toast.LENGTH_SHORT).show();
+            if (!DeviceUtil.checkDiskSize()) {
+                Toast.makeText(getContext(), "存储空间不足，请清理设备后使用!", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             if (mCallback != null) {
-                if (!isValidClick()) return;
+                if (!isValidClickLong()) return;
                 if (mCallback != null) {
                     mCallback.recordStart();
                     setRecordDotShow(true);
@@ -132,7 +133,7 @@ public class MyVidoeController extends RelativeLayout {
         btnStart.setOnFocusChangeListener(new OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean b) {
-                btnStart.setAlpha(b?0.95f:0.5f);
+                btnStart.setAlpha(b ? 0.95f : 0.5f);
             }
         });
 
@@ -143,6 +144,15 @@ public class MyVidoeController extends RelativeLayout {
 
     public boolean isValidClick() {
         if (System.currentTimeMillis() - lastActionClicked > 2000) {
+            lastActionClicked = System.currentTimeMillis();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isValidClickLong() {
+        if (System.currentTimeMillis() - lastActionClicked > 5000) {
             lastActionClicked = System.currentTimeMillis();
             return true;
         } else {
@@ -190,9 +200,19 @@ public class MyVidoeController extends RelativeLayout {
         }
     }
 
+    public static final int TIME_ALERT = 45;//开始提示警告
+    public static final int TIME_FINISH_AUTO = 60;//自动结束任务
+
+
     public void refreshTimer(long time) {
         if (tvTimer != null) {
             tvTimer.setText(TimeUtil.formatTime(time));
+            setVisableTimerAlert(time > TIME_ALERT * 60 * 1000);
+            if (time > TIME_FINISH_AUTO * 60 * 1000) {
+                if (isTaskRecording) {
+                    btnStop.performClick();
+                }
+            }
         }
     }
 
@@ -201,7 +221,7 @@ public class MyVidoeController extends RelativeLayout {
         Log.d("RAMBO", "voice progress = " + progress);
         llVoiceMark.setVisibility(View.VISIBLE);
         voiceProgress.setMax(100);
-        voiceProgress.setProgress(100-progress);
+        voiceProgress.setProgress(100 - progress);
 
         Animation setAnim = AnimationUtils.loadAnimation(getContext(), R.anim.view_translate_top_in);
         setAnim.setAnimationListener(new Animation.AnimationListener() {
@@ -221,8 +241,8 @@ public class MyVidoeController extends RelativeLayout {
             }
         });
 
-        if(!isAniVoiceMarkerShowing){
-            isAniVoiceMarkerShowing =true;
+        if (!isAniVoiceMarkerShowing) {
+            isAniVoiceMarkerShowing = true;
             llVoiceMark.startAnimation(setAnim);
         }
 
@@ -230,13 +250,13 @@ public class MyVidoeController extends RelativeLayout {
 
     public void hideVoiceMarker() {
         llVoiceMark.setVisibility(View.GONE);
-        isAniVoiceMarkerShowing =false;
+        isAniVoiceMarkerShowing = false;
     }
 
     public void showBackgroundAction(boolean isShow) {
         btnSwitchCamera.setVisibility(isShow ? View.VISIBLE : View.GONE);
         btnExitApp.setVisibility(isShow ? View.VISIBLE : View.GONE);
-        btnStart.setVisibility(isShow?View.VISIBLE:View.GONE);
+        btnStart.setVisibility(isShow ? View.VISIBLE : View.GONE);
     }
 
 
@@ -273,16 +293,17 @@ public class MyVidoeController extends RelativeLayout {
         }
     }
 
-    public void showImageMarking(){
+    public void showImageMarking() {
         llImageMarking.setVisibility(View.VISIBLE);
         Animation setAnim = AnimationUtils.loadAnimation(getContext(), R.anim.view_translate_top_in);
         llImageMarking.startAnimation(setAnim);
     }
-    public void hideImageMarkding(){
+
+    public void hideImageMarkding() {
         llImageMarking.setVisibility(View.GONE);
     }
 
-    public void showMarkSuccess(){
+    public void showMarkSuccess() {
 
         llMarkSuccess.setVisibility(View.VISIBLE);
 
@@ -292,7 +313,7 @@ public class MyVidoeController extends RelativeLayout {
 
     }
 
-    public void hideMarkSuccess(){
+    public void hideMarkSuccess() {
         llMarkSuccess.setVisibility(View.GONE);
     }
 
@@ -301,7 +322,7 @@ public class MyVidoeController extends RelativeLayout {
 
         Log.d("RAMBO", "MyVideoController SlideChange = " + DIR);
 
-        if (DIR == MyGestureListener.DIR_UP && btnStart.getVisibility() == View.GONE && llRecording.getVisibility()==View.GONE) {
+        if (DIR == MyGestureListener.DIR_UP && btnStart.getVisibility() == View.GONE && llRecording.getVisibility() == View.GONE) {
             showOrHideControl(true);
             facousPauseOrContinue();
             return;
@@ -386,7 +407,7 @@ public class MyVidoeController extends RelativeLayout {
 //                showOrHideControl(true);
             } else if (DIR == MyGestureListener.DIR_DOWN) {
                 showOrHideControl(false);
-            } else if(DIR == MyGestureListener.DIR_RIGHT){
+            } else if (DIR == MyGestureListener.DIR_RIGHT) {
 
             }
         }
@@ -426,18 +447,24 @@ public class MyVidoeController extends RelativeLayout {
         llRecording.startAnimation(animation);
     }
 
-    public void hideControler(){
+    public void hideControler() {
         llRecording.setVisibility(View.GONE);
     }
 
     public void doClickAnim(View view) {
-        if(!Constants.isAniClick)return;
-        ((Activity)getContext()).runOnUiThread(new Runnable() {
+        if (!Constants.isAniClick) return;
+        ((Activity) getContext()).runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 Animation setAnim = AnimationUtils.loadAnimation(getContext(), R.anim.view_click);
                 view.startAnimation(setAnim);
             }
         });
+    }
+
+    public void setVisableTimerAlert(boolean visable) {
+        if (tvTimerAlert != null) {
+            tvTimerAlert.setVisibility(visable ? View.VISIBLE : View.GONE);
+        }
     }
 }

@@ -139,7 +139,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         myVideoController.setControllerCallback(new CameraController.ControllerCallback() {
             @Override
             public void takePicture() {
-                markRecord(true);
+//                markRecord(true);
             }
 
             @Override
@@ -430,7 +430,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
                 });
             }
         }
-        myVideoController.setPreViewImage(bitmap);
+//        myVideoController.setPreViewImage(bitmap);
     }
 
     @Override
@@ -745,10 +745,13 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
 
     //截图按键 短按一下 500ms 内,拍照 Mark
     public void onMarkShortClicked() {
-        Log.d("RAMBO", "Voice单击事件触发拍照功能！");
-        markRecord(true);
-        isForVoiceMark = false;
-        isStartVoice = false;
+        if(!isStartVoice){
+            Log.d("RAMBO", "onMarkShortClicked : Voice单击事件触发拍照功能！");
+            markRecord(true);
+            isForVoiceMark = false;
+            isStartVoice = false;
+            isStartKeyDown = false;
+        }
         myVideoController.hideVoiceMarker();
     }
 
@@ -756,7 +759,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     public void onMarkLongClickStart() {
         isStartVoice = true;
 //        ToastUtils.show("录音开始");
-        Log.d("RAMBO", "Voice长按开始");
+        Log.d("RAMBO", "onMarkLongClickStart :Voice长按开始");
         audioStartTime = periodTime / 1000;
         audioStartTimeLong = System.currentTimeMillis();
         markRecord(false);
@@ -788,7 +791,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
             audioDownTime = System.currentTimeMillis();
         } else if (isStartKeyDown) {
             //持续触发按下操作
-            if ((!isStartVoice) && (System.currentTimeMillis() - audioDownTime) > 1000) {
+            if ((!isStartVoice) && (System.currentTimeMillis() - audioDownTime) > 500) {
                 //长按1000ms以上，触发长按开始
                 onMarkLongClickStart();
                 //长按开始，则表示没有ReleaseKey，倒计时结束也不会isReleaseVoiceKey=true,除否松开按键。
