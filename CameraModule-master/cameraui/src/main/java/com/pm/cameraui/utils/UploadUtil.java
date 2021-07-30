@@ -41,10 +41,9 @@ public class UploadUtil {
                 ObsClient obsClient = new ObsClient(huaweiCloudConfig.ak, huaweiCloudConfig.sk, huaweiCloudConfig.endPoint);
                 UploadFileRequest request = new UploadFileRequest(huaweiCloudConfig.bucketName, objectKey);
                 request.setUploadFile(filePath);
-                request.setTaskNum(10);
+                request.setTaskNum(5);
                 request.setEnableCheckpoint(true);
                 ObjectMetadata objectMetadata = new ObjectMetadata();
-//                objectMetadata.setContentType("video/mp4;charset=UTF-8");
                 request.setObjectMetadata(objectMetadata);
                 request.setProgressListener(progressListener);
 
