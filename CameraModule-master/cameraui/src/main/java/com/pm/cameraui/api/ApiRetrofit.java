@@ -18,8 +18,8 @@ import okhttp3.ResponseBody;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 public class ApiRetrofit {
-//    public final String BASE_SERVER_URL = "http://112.65.179.30:7246/";//正式发布
-      public final String BASE_SERVER_URL = "http://47.97.204.51:7246/";//测试发布
+    public final String BASE_SERVER_URL = "http://112.65.179.30:7246/";//正式发布
+//      public final String BASE_SERVER_URL = "http://47.97.204.51:7246/";//测试发布
 
 //    public final String BASE_SERVER_URL = "http://112.65.179.30:7246/";
 //    public final String BASE_SERVER_URL = "http://test-ins.arcloud.net/app/";

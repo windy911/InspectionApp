@@ -168,7 +168,7 @@ public class CameraActivity extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         // || KeyEvent.KEYCODE_VOLUME_DOWN == keyCode
         if (KeyEvent.KEYCODE_ALL_APPS == keyCode) {
-            if ((System.currentTimeMillis() - ClickedLastTimer) > 2000) {
+            if ((System.currentTimeMillis() - ClickedLastTimer) > 1000) {
                 ((VideoFragment) fragment).onVoiceKeyDown();
                 ClickedLastTimer = System.currentTimeMillis();
             }
