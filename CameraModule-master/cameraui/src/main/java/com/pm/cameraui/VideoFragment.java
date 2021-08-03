@@ -81,6 +81,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
     private TextView tvProgress;
     private String strProgress;
     private boolean isFinishedTask = false;
+    public static boolean isUploading = false;
 
 
     public static VideoFragment newInstance() {
@@ -644,12 +645,17 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         MarkUtil.generateAudioForMarks(recordSave.inspectRecord, recordSave.markList, presenter, true);
 
         RecordSaveUtils.removeRecordSave(getActivity(), recordSave);
-        if (RecordSaveUtils.haveLocalSaves(getActivity())) {
+        if (RecordSaveUtils.haveLocalSaves(getActivity())&& (!isUploading())) {
             startBackgroundUpload();
         }else{
-            //没有待上传的数据文件，做本地残余文件删除处理工作
-//            DeviceUtil.clearMediaFiles(getContext());
+
+
         }
+    }
+
+    //判断当前是否正在上传数据中，有则不启动新的上传任务
+    public boolean isUploading(){
+        return isUploading;
     }
 
     //关闭当前InspcetionTopic任务，上传数据。显示对话框。拿到了合并后的视频文件地址，还有更新录制时长。
@@ -964,10 +970,12 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
         uploadVideoFileToHuaWei_2(recordSave);
     }
 
+
     public void uploadVideoFileToHuaWei_2(RecordSave recordSave) {
         UploadUtil.upload(recordSave.videoFilePath, new ProgressListener() {
             @Override
             public void progressChanged(ProgressStatus progressStatus) {
+                isUploading = true;
                 Log.d("RAMBO", "uploadVideoFileToHuaWei_2 percent = " + progressStatus.getTransferPercentage());
             }
         }, new UploadUtil.OnUploadsListener() {
@@ -978,6 +986,7 @@ public class VideoFragment extends BaseFragment<VideoPresenter> implements Deleg
                 recordSave.inspectRecord.setUploadStatus(UploadStatus.UPLOAD_SUCCESS);
                 recordSave.inspectRecord.setTraceLocus(LocationUtil.getLocationString());
                 presenter.updateInspectRecord2(recordSave);
+                isUploading = false;
             }
         });
     }

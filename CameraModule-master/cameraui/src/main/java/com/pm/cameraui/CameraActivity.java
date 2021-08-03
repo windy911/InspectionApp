@@ -101,6 +101,12 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d("RAMBO","CameraActivity onPause");
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         hideNavigation();

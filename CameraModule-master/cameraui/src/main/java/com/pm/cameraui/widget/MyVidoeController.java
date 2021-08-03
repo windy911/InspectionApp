@@ -15,6 +15,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.pm.cameraui.CameraActivity;
 import com.pm.cameraui.Constants;
 import com.pm.cameraui.R;
 import com.pm.cameraui.base.MyGestureListener;
@@ -202,16 +203,19 @@ public class MyVidoeController extends RelativeLayout {
 
     public static final int TIME_ALERT = 45;//开始提示警告
     public static final int TIME_FINISH_AUTO = 60;//自动结束任务
-
+    public boolean isMaxTimer = false;
 
     public void refreshTimer(long time) {
         if (tvTimer != null) {
             tvTimer.setText(TimeUtil.formatTime(time));
             setVisableTimerAlert(time > TIME_ALERT * 60 * 1000);
             if (time > TIME_FINISH_AUTO * 60 * 1000) {
-                if (isTaskRecording) {
+                if (isTaskRecording && (!isMaxTimer)) {
+                    isMaxTimer = true;
                     btnStop.performClick();
                 }
+            } else {
+                isMaxTimer = false;
             }
         }
     }
@@ -318,7 +322,7 @@ public class MyVidoeController extends RelativeLayout {
     }
 
     public void slideFocusChange(int DIR) {
-
+        CameraActivity.instance.hideNavigation();
 
         Log.d("RAMBO", "MyVideoController SlideChange = " + DIR);
 
@@ -420,6 +424,8 @@ public class MyVidoeController extends RelativeLayout {
     }
 
     public void showOrHideControl(boolean isShow) {
+        Log.d("RAMBO","showOrHideControl");
+
 
         if (!isTaskRecording) {
             return;

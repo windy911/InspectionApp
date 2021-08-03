@@ -19,6 +19,7 @@ import android.widget.EditText;
 
 import com.pm.cameraui.CameraActivity;
 import com.pm.cameraui.Constants;
+import com.pm.cameraui.VideoFragment;
 import com.pm.cameraui.base.BaseActivity;
 import com.pm.cameraui.base.MyGestureListener;
 import com.pm.cameraui.base.MyRightLeftListener;
@@ -44,6 +45,8 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainVie
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
+
+        VideoFragment.isUploading = false;
     }
 
     @Override
