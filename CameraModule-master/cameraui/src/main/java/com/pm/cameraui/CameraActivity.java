@@ -196,7 +196,6 @@ public class CameraActivity extends AppCompatActivity {
 
 
     public void location() {
-//        if (mLocationClient == null) {
         //初始化定位
         if (mLocationClient != null) {
             mLocationClient.stopLocation();

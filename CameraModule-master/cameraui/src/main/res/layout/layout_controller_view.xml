@@ -176,7 +176,7 @@
 
     <TextView android:id="@+id/tvTimerAlert"
         android:layout_width="wrap_content"
-        android:text="单次记录最长1小时,超时将自动结束保存,您可分多次记录更长时间的工作."
+        android:text="单次记录最长30分钟,超时将自动结束保存,您可分多次记录更长时间的工作."
         android:layout_below="@id/llTimer"
         android:layout_centerHorizontal="true"
         android:textSize="12sp"

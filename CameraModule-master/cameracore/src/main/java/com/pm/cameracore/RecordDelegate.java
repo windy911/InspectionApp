@@ -480,7 +480,7 @@ public class RecordDelegate implements CameraDelegate {
 
         mNextVideoAbsolutePath = createVideoFilePath(mContext);
         mMediaRecorder.setOutputFile(mNextVideoAbsolutePath);
-        mMediaRecorder.setVideoEncodingBitRate(10000000);
+        mMediaRecorder.setVideoEncodingBitRate(8000000);
 
         //每秒30帧
         mMediaRecorder.setVideoFrameRate(15);

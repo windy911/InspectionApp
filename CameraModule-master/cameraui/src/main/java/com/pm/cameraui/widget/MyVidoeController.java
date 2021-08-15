@@ -201,8 +201,8 @@ public class MyVidoeController extends RelativeLayout {
         }
     }
 
-    public static final int TIME_ALERT = 45;//开始提示警告
-    public static final int TIME_FINISH_AUTO = 60;//自动结束任务
+    public static final int TIME_ALERT = 25;//开始提示警告
+    public static final int TIME_FINISH_AUTO = 30;//自动结束任务
     public boolean isMaxTimer = false;
 
     public void refreshTimer(long time) {
