@@ -149,15 +149,15 @@ public class RecordDelegate implements CameraDelegate {
         setupCameraOutputs(width, height);
         //step2 配置相机预览的方向
         configureTransform(width, height);
-//        try {
-//            //信号量中尝试获取一个许可
-//            if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
-//                throw new RuntimeException("Time out waiting to lock camera opening.");
-//            }
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//            Log.e(TAG, "openCamera: Interrupted while trying to lock camera opening.");
-//        }
+        try {
+            //信号量中尝试获取一个许可
+            if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
+                throw new RuntimeException("Time out waiting to lock camera opening.");
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            Log.e(TAG, "openCamera: Interrupted while trying to lock camera opening.");
+        }
         //step3 打开相机
         try {
             Log.d("RAMBO","openCamera id = "+ mCameraId);
